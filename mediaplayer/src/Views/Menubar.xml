@@ -1,0 +1,7 @@
+<interface><menu id="MenuBar">
+	<submenu>
+		<attribute name="label">_File</attribute><item>
+	<attribute name="label">_Open</attribute>
+	<attribute name="action">win.fileopen</attribute></item>
+		</submenu>
+	</menu></interface>

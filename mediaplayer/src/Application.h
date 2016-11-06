@@ -10,6 +10,7 @@
 
 #include <gtkmm.h>
 #include "Widgets/Window.h"
+#include "Factories/IMenuFactory.h"
 
 namespace Mediaplayer {
 
@@ -21,7 +22,9 @@ protected:
 	void on_startup() override;
 	void on_activate() override;
 private:
+	using MenuBarPtr = std::unique_ptr<IMenuFactory>;
 	Window mainWindow;
+	MenuBarPtr menuBar;
 };
 
 } /* namespace Mediaplayer */

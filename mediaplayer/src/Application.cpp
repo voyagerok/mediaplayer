@@ -6,15 +6,18 @@
  */
 
 #include "Application.h"
+#include "Factories/MenuBarFactory.h"
 
 namespace Mediaplayer {
 
 Application::Application(int argc, char** argv) :
-		Gtk::Application(argc, argv, "org.apps.mediaplayer") {
+		Gtk::Application(argc, argv, "org.apps.mediaplayer"), menuBar(
+				new MenuBarFactory) {
 }
 
 void Application::on_startup() {
 	Gtk::Application::on_startup();
+	set_menubar(menuBar->CreateMenuInstance());
 }
 
 void Application::on_activate() {
@@ -24,7 +27,7 @@ void Application::on_activate() {
 }
 
 Glib::RefPtr<Application> Application::create(int argc, char **argv) {
-	return Glib::RefPtr<Application> (new Application(argc, argv));
+	return Glib::RefPtr<Application>(new Application(argc, argv));
 }
 
 } /* namespace Mediaplayer */
