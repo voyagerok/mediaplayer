@@ -1,0 +1,2 @@
+bin_PROGRAMS=mediaplayer
+mediaplayer_SOURCES=main.cpp
