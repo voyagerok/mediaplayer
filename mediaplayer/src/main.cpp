@@ -8,11 +8,12 @@
  ============================================================================
  */
 
-#include <iostream>
+#include <gtkmm.h>
+#include "Application.h"
 
 using namespace std;
 
-int main(void) {
-	cout << "Hey" << endl; /* prints Hey */
-	return 0;
+int main(int argc, char **argv) {
+	auto app = Mediaplayer::Application::create(argc, argv);
+	return app->run();
 }

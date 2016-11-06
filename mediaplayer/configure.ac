@@ -9,6 +9,8 @@ AM_INIT_AUTOMAKE()
 
 AC_PROG_CXX
 
+PKG_CHECK_MODULES([MEDIAPLAYER], [gtkmm-3.0 mpv])
+
 AC_CONFIG_FILES(Makefile src/Makefile)
 AC_OUTPUT
 

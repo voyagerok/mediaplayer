@@ -2,3 +2,6 @@
 /Makefile
 /Makefile.in
 /mediaplayer
+/mediaplayer-Application.o
+/mediaplayer-main.o
+/mediaplayer-Window.o
