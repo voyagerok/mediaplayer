@@ -10,11 +10,15 @@
 
 #include <gtkmm.h>
 
+namespace Mediaplayer {
+
 class IMenuFactory {
 public:
 	virtual Glib::RefPtr<Gio::Menu> CreateMenuInstance() = 0;
 	virtual ~IMenuFactory() {}
 };
+
+} /* namespace Mediaplayer */
 
 
 #endif /* FACTORIES_IMENUFACTORY_H_ */

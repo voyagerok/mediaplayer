@@ -8,13 +8,18 @@
 #ifndef WIDGETS_WINDOW_H_
 #define WIDGETS_WINDOW_H_
 
-#include <gtkmm-3.0/gtkmm/applicationwindow.h>
+#include <gtkmm.h>
+#include "Dialogs/IFileDialog.h"
 
 namespace Mediaplayer {
 
 class Window: public Gtk::ApplicationWindow {
 public:
 	Window();
+private:
+	void on_file_open();
+	using FileDialogPtr = std::unique_ptr<IFileDialog>;
+	FileDialogPtr openFileDialog;
 };
 
 } /* namespace Mediaplayer */
