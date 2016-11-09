@@ -9,7 +9,7 @@
 #define WIDGETS_WINDOW_H_
 
 #include <gtkmm.h>
-#include "Dialogs/IFileDialog.h"
+#include "../Dialogs/IFileDialog.h"
 
 namespace Mediaplayer {
 
