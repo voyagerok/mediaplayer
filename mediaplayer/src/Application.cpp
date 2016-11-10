@@ -17,13 +17,17 @@ Application::Application(int argc, char** argv) :
 
 void Application::on_startup() {
 	Gtk::Application::on_startup();
+
 	set_menubar(menuBar->CreateMenuInstance());
+	add_window(mainWindow);
+	mainWindow.show_all();
+
+	mpvHandler.initialize(mainWindow.get_mpv_container_wid());
 }
 
 void Application::on_activate() {
 	Gtk::Application::on_activate();
-	add_window(mainWindow);
-	mainWindow.show_all();
+	mainWindow.present();
 }
 
 Glib::RefPtr<Application> Application::create(int argc, char **argv) {

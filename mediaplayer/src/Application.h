@@ -11,12 +11,14 @@
 #include <gtkmm.h>
 #include "Widgets/Window.h"
 #include "Factories/IMenuFactory.h"
+#include "MpvHandleWrapper.h"
 
 namespace Mediaplayer {
 
 class Application: public Gtk::Application {
 public:
 	static Glib::RefPtr<Application> create(int, char**);
+	MpvHandleWrapper& get_mpv_handler() { return mpvHandler; }
 protected:
 	Application(int, char**);
 	void on_startup() override;
@@ -25,6 +27,7 @@ private:
 	using MenuBarPtr = std::unique_ptr<IMenuFactory>;
 	Window mainWindow;
 	MenuBarPtr menuBar;
+	MpvHandleWrapper mpvHandler;
 };
 
 } /* namespace Mediaplayer */

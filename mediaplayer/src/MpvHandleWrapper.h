@@ -9,6 +9,7 @@
 #define MPVHANDLEWRAPPER_H_
 
 #include <mpv/client.h>
+#include <string>
 
 namespace Mediaplayer {
 
@@ -16,8 +17,13 @@ class MpvHandleWrapper {
 public:
 	MpvHandleWrapper();
 	virtual ~MpvHandleWrapper();
+	void initialize(int64_t wid);
+	void load(const std::string &filename);
 private:
 	mpv_handle *mpv;
+	int64_t wid = -1;
+	enum class State {Allocated, Initialized};
+	State currentState;
 };
 
 } /* namespace Mediaplayer */

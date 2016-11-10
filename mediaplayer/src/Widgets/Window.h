@@ -10,16 +10,19 @@
 
 #include <gtkmm.h>
 #include "../Dialogs/IFileDialog.h"
+#include "MpvContainer.h"
 
 namespace Mediaplayer {
 
 class Window: public Gtk::ApplicationWindow {
 public:
 	Window();
+	int64_t get_mpv_container_wid();
 private:
 	void on_file_open();
 	using FileDialogPtr = std::unique_ptr<IFileDialog>;
 	FileDialogPtr openFileDialog;
+	MpvContainer container;
 };
 
 } /* namespace Mediaplayer */
