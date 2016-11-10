@@ -19,10 +19,13 @@ public:
 	Window();
 	int64_t get_mpv_container_wid();
 private:
+	bool on_key_release(GdkEventKey*);
 	void on_file_open();
+	void toggle_fullscreen();
 	using FileDialogPtr = std::unique_ptr<IFileDialog>;
 	FileDialogPtr openFileDialog;
 	MpvContainer container;
+	bool isFullscreen = false;
 };
 
 } /* namespace Mediaplayer */

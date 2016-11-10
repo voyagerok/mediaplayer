@@ -18,6 +18,8 @@ Window::Window() :
 	set_title("Mediaplayer");
 	add_action("fileopen", sigc::mem_fun(*this, &Window::on_file_open));
 	add(container);
+
+	signal_key_release_event().connect(sigc::mem_fun(*this, &Window::on_key_release));
 }
 
 void Window::on_file_open() {
@@ -34,6 +36,31 @@ void Window::on_file_open() {
 
 int64_t Window::get_mpv_container_wid() {
 	return container.get_wid();
+}
+
+bool Window::on_key_release(GdkEventKey *key) {
+
+	auto keyvalUpper = gdk_keyval_to_upper(key->keyval);
+
+	switch(keyvalUpper) {
+	case GDK_KEY_F:
+		toggle_fullscreen();
+		set_show_menubar(!isFullscreen);
+		break;
+	default:
+		break;
+	}
+
+	return true;
+}
+
+void Window::toggle_fullscreen() {
+	if (!isFullscreen) {
+		fullscreen();
+	} else {
+		unfullscreen();
+	}
+	isFullscreen = !isFullscreen;
 }
 
 } /* namespace Mediaplayer */
