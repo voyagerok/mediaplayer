@@ -11,23 +11,27 @@
 #include <gtkmm.h>
 #include "Widgets/Window.h"
 #include "Factories/IMenuFactory.h"
-#include "MpvHandleWrapper.h"
+#include "Dialogs/IFileDialog.h"
+#include <vector>
 
 namespace Mediaplayer {
 
 class Application: public Gtk::Application {
 public:
 	static Glib::RefPtr<Application> create(int, char**);
-	MpvHandleWrapper& get_mpv_handler() { return mpvHandler; }
 protected:
 	Application(int, char**);
 	void on_startup() override;
 	void on_activate() override;
+	void on_open_in_new_window();
+	void on_window_hidden(Gtk::Window*);
 private:
 	using MenuBarPtr = std::unique_ptr<IMenuFactory>;
-	Window mainWindow;
+	using FileDialogPtr = std::unique_ptr<IFileDialog>;
 	MenuBarPtr menuBar;
-	MpvHandleWrapper mpvHandler;
+	FileDialogPtr fileDialog;
+
+	void store_window(Window *window);
 };
 
 } /* namespace Mediaplayer */

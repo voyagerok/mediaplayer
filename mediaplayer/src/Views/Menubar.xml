@@ -6,6 +6,10 @@
 				<attribute name="label">_Open</attribute>
 				<attribute name="action">win.fileopen</attribute>
 			</item>
+			<item>
+				<attribute name="label">_Open in new window</attribute>
+				<attribute name="action">app.openinwindow</attribute>
+			</item>
 		</submenu>
 	</menu>
 </interface>

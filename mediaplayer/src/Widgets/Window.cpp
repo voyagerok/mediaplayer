@@ -16,21 +16,24 @@ Window::Window() :
 
 	set_default_size(800, 600);
 	set_title("Mediaplayer");
-	add_action("fileopen", sigc::mem_fun(*this, &Window::on_file_open));
 	add(container);
 
-	signal_key_release_event().connect(sigc::mem_fun(*this, &Window::on_key_release));
+	add_action("fileopen", sigc::mem_fun(*this, &Window::on_file_open));
+	signal_key_release_event().connect(
+			sigc::mem_fun(*this, &Window::on_key_release));
+}
+
+void Window::load_file(const std::string &filename) {
+	if (!get_realized())
+		realize();
+	mpvHandler.load(filename);
 }
 
 void Window::on_file_open() {
 	auto result = openFileDialog->ShowDialog(*this);
 	if (result == DialogResult::Confirmed) {
 		std::string filename = openFileDialog->GetFilename();
-		auto currentApp = Glib::RefPtr<Application>::cast_dynamic(
-				Gio::Application::get_default());
-		if (currentApp) {
-			currentApp->get_mpv_handler().load(filename);
-		}
+		mpvHandler.load(filename);
 	}
 }
 
@@ -42,7 +45,7 @@ bool Window::on_key_release(GdkEventKey *key) {
 
 	auto keyvalUpper = gdk_keyval_to_upper(key->keyval);
 
-	switch(keyvalUpper) {
+	switch (keyvalUpper) {
 	case GDK_KEY_F:
 		toggle_fullscreen();
 		set_show_menubar(!isFullscreen);
@@ -62,5 +65,11 @@ void Window::toggle_fullscreen() {
 	}
 	isFullscreen = !isFullscreen;
 }
+
+void Window::on_realize() {
+	Gtk::Window::on_realize();
+	mpvHandler.initialize(container.get_wid());
+}
+
 
 } /* namespace Mediaplayer */

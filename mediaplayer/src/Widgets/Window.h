@@ -11,6 +11,7 @@
 #include <gtkmm.h>
 #include "../Dialogs/IFileDialog.h"
 #include "MpvContainer.h"
+#include "../MpvHandleWrapper.h"
 
 namespace Mediaplayer {
 
@@ -18,14 +19,22 @@ class Window: public Gtk::ApplicationWindow {
 public:
 	Window();
 	int64_t get_mpv_container_wid();
-private:
+	void load_file(const std::string &filename);
+
+protected:
 	bool on_key_release(GdkEventKey*);
+	void on_realize() override;
+
+private:
 	void on_file_open();
 	void toggle_fullscreen();
+
 	using FileDialogPtr = std::unique_ptr<IFileDialog>;
+
 	FileDialogPtr openFileDialog;
 	MpvContainer container;
 	bool isFullscreen = false;
+	MpvHandleWrapper mpvHandler;
 };
 
 } /* namespace Mediaplayer */

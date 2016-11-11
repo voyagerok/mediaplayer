@@ -7,31 +7,57 @@
 
 #include "Application.h"
 #include "Factories/MenuBarFactory.h"
+#include "Dialogs/Gtk3FileDialog.h"
+#include <iostream>
 
 namespace Mediaplayer {
 
 Application::Application(int argc, char** argv) :
 		Gtk::Application(argc, argv, "org.apps.mediaplayer"), menuBar(
-				new MenuBarFactory) {
+				new MenuBarFactory), fileDialog { new Gtk3FileDialog } {
+	add_action("openinwindow",
+			sigc::mem_fun(*this, &Application::on_open_in_new_window));
 }
 
 void Application::on_startup() {
 	Gtk::Application::on_startup();
-
 	set_menubar(menuBar->CreateMenuInstance());
-	add_window(mainWindow);
-	mainWindow.show_all();
 
-	mpvHandler.initialize(mainWindow.get_mpv_container_wid());
+	Window *window { new Window };
+	store_window(window);
+	window->show_all();
 }
 
 void Application::on_activate() {
 	Gtk::Application::on_activate();
-	mainWindow.present();
 }
 
 Glib::RefPtr<Application> Application::create(int argc, char **argv) {
 	return Glib::RefPtr<Application>(new Application(argc, argv));
+}
+
+void Application::on_open_in_new_window() {
+
+	if (auto window = get_active_window()) {
+		auto result = fileDialog->ShowDialog(*window);
+		if (result == DialogResult::Confirmed) {
+			Window *window { new Window };
+			store_window(window);
+			window->load_file(fileDialog->GetFilename());
+			window->show_all();
+		}
+	}
+}
+
+void Application::store_window(Window *window) {
+	window->signal_hide().connect(
+			sigc::bind(sigc::mem_fun(*this, &Application::on_window_hidden),
+					window));
+	add_window(*window);
+}
+
+void Application::on_window_hidden(Gtk::Window *window) {
+	delete window;
 }
 
 } /* namespace Mediaplayer */

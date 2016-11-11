@@ -28,8 +28,8 @@ int64_t MpvContainer::get_wid() {
 bool MpvContainer::on_draw(const Cairo::RefPtr<Cairo::Context> &cr) {
 
 	auto allocation = get_allocation();
-	cr->rectangle(0,0, allocation.get_width(), allocation.get_height());
-	cr->set_source_rgb(0,0,0);
+	cr->rectangle(0, 0, allocation.get_width(), allocation.get_height());
+	cr->set_source_rgb(0, 0, 0);
 	cr->fill();
 }
 
