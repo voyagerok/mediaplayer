@@ -11,6 +11,11 @@
 
 namespace Mediaplayer {
 
+static void wakeup_callback(void *param) {
+	MpvHandleWrapper *handler = static_cast<MpvHandleWrapper*>(param);
+	handler->mpv_events().emit();
+}
+
 MpvHandleWrapper::MpvHandleWrapper() {
 	setlocale(LC_NUMERIC, "C");
 
@@ -38,6 +43,12 @@ void MpvHandleWrapper::initialize(int64_t wid) {
 	// Enable keyboard input on the X11 window. For the messy details, see
 	// --input-vo-keyboard on the manpage.
 	mpv_set_option_string(mpv, "input-vo-keyboard", "yes");
+
+	mpv_observe_property(mpv, 0, percent_pos_prop_name, MPV_FORMAT_DOUBLE);
+	mpv_observe_property(mpv, 0, duration_prop_name, MPV_FORMAT_INT64);
+
+	mpv_events().connect(sigc::mem_fun(*this, &MpvHandleWrapper::on_mpv_events));
+	mpv_set_wakeup_callback(mpv, wakeup_callback, this);
 
 	auto error = mpv_initialize(mpv);
 	if (error < 0)
@@ -69,11 +80,38 @@ void MpvHandleWrapper::seek(int percentage) {
 		return;
 	}
 
-	const char *command[] = {"seek", std::to_string(percentage).c_str(), "absolute-percent", nullptr};
+	const char *command[] = {"seek", std::to_string(percentage).c_str(), "absolute", nullptr};
 	auto error = mpv_command_async(mpv, 0, command);
 	if (error < 0) {
 		std::cerr << "seek failed: " << mpv_error_string(error) << std::endl;
 		return;
+	}
+}
+
+void MpvHandleWrapper::on_mpv_events() {
+
+	static int percent_pos_events_count = 0;
+	while (mpv) {
+		mpv_event *event = mpv_wait_event(mpv, 0);
+		if (event->event_id == MPV_EVENT_NONE)
+			break;
+		switch (event->event_id) {
+		case MPV_EVENT_PROPERTY_CHANGE: {
+			mpv_event_property *prop = static_cast<mpv_event_property*>(event->data);
+//			if (strcmp(prop->name ,percent_pos_prop_name) == 0) {
+//				if (++percent_pos_events_count == 100) {
+//					playback_progress_signal().emit(*static_cast<double*>(prop->data));
+//					percent_pos_events_count = 0;
+//				}
+//			}
+			if (strcmp(prop->name, duration_prop_name) == 0) {
+				duration_signal().emit(*static_cast<int*>(prop->data));
+			}
+			break;
+		}
+		default:
+			break;
+		}
 	}
 }
 

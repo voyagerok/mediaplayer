@@ -8,6 +8,7 @@
 #include "Window.h"
 #include "../Dialogs/Gtk3FileDialog.h"
 #include "../Application.h"
+#include <cmath>
 
 namespace Mediaplayer {
 
@@ -18,7 +19,8 @@ Window::Window() :
 	set_default_size(800, 600);
 	set_title("Mediaplayer");
 
-	m_slider.signal_value_changed().connect(sigc::mem_fun(*this, &Window::on_slider_value_changed));
+	m_slider.signal_value_changed().connect(
+			sigc::mem_fun(*this, &Window::on_slider_value_changed));
 
 	m_box.pack_start(container, true, true, 0);
 	m_box.pack_start(m_slider, false, true, 10);
@@ -27,6 +29,11 @@ Window::Window() :
 	add_action("fileopen", sigc::mem_fun(*this, &Window::on_file_open));
 	signal_key_release_event().connect(
 			sigc::mem_fun(*this, &Window::on_key_release));
+
+	mpvHandler.playback_progress_signal().connect(
+			sigc::mem_fun(*this, &Window::on_mpv_progress_signal));
+	mpvHandler.duration_signal().connect(
+			sigc::mem_fun(*this, &Window::on_mpv_duration_signal));
 }
 
 void Window::load_file(const std::string &filename) {
@@ -78,8 +85,33 @@ void Window::on_realize() {
 }
 
 void Window::on_slider_value_changed() {
-	auto currentValue = m_slider.get_value();
-	mpvHandler.seek(currentValue);
+	if (m_slider.get_left_mouse_button_pressed()) {
+		auto currentValue = m_slider.get_value();
+		mpvHandler.seek(floor(currentValue));
+	}
+}
+
+void Window::on_mpv_progress_signal(double value) {
+	m_slider.set_value(floor(value));
+}
+
+void Window::on_mpv_duration_signal(int value) {
+	m_slider.set_sensitive(true);
+	m_slider.set_range(0, value);
+	sigc::slot<bool> update_slider_slot = sigc::bind(
+			sigc::mem_fun(*this, &Window::on_slider_update_timeout), 0);
+	update_slider_connection = Glib::signal_timeout().connect(
+			update_slider_slot, 1000);
+}
+
+bool Window::on_slider_update_timeout(int) {
+
+	auto current = m_slider.get_value();
+	if (current < m_slider.get_adjustment()->get_upper()) {
+		m_slider.set_value(current + 1);
+		return true;
+	}
+	return false;
 }
 
 } /* namespace Mediaplayer */

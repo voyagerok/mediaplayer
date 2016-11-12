@@ -16,6 +16,12 @@ class Slider: public Gtk::Scale {
 public:
 	Slider();
 	explicit Slider(Gtk::Orientation);
+	bool get_left_mouse_button_pressed() {return left_mouse_button_pressed;}
+protected:
+	bool on_button_press_event(GdkEventButton*) override;
+	bool on_button_release_event(GdkEventButton*) override;
+private:
+	bool left_mouse_button_pressed = false;
 };
 
 } /* namespace Mediaplayer */

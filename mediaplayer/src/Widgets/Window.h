@@ -26,10 +26,13 @@ protected:
 	bool on_key_release(GdkEventKey*);
 	void on_realize() override;
 	void on_slider_value_changed();
+	void on_mpv_progress_signal(double);
+	void on_mpv_duration_signal(int);
 
 private:
 	void on_file_open();
 	void toggle_fullscreen();
+	bool on_slider_update_timeout(int);
 
 	using FileDialogPtr = std::unique_ptr<IFileDialog>;
 
@@ -39,6 +42,8 @@ private:
 	MpvHandleWrapper mpvHandler;
 	Gtk::Box m_box;
 	Slider m_slider;
+
+	sigc::connection update_slider_connection;
 };
 
 } /* namespace Mediaplayer */
