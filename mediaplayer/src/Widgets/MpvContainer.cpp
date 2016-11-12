@@ -7,13 +7,18 @@
 
 #include "MpvContainer.h"
 #include <gdk/gdkx.h>
+#include <iostream>
 
 namespace Mediaplayer {
 
 int64_t MpvContainer::get_wid() {
 
-	auto parent = this->get_parent_window();
-	if (parent && !get_realized())
+	std::cerr << "mpv_container realized: " << get_realized() << std::endl;
+
+//	auto parent = this->get_parent_window();
+//	if (parent && !get_realized())
+//		realize();
+	if (!get_realized())
 		realize();
 
 	Glib::RefPtr<Gdk::Window> window = get_window();

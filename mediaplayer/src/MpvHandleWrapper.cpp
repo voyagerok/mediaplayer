@@ -7,6 +7,7 @@
 
 #include "MpvHandleWrapper.h"
 #include <stdexcept>
+#include <iostream>
 
 namespace Mediaplayer {
 
@@ -22,6 +23,10 @@ MpvHandleWrapper::MpvHandleWrapper() {
 
 void MpvHandleWrapper::initialize(int64_t wid) {
 
+	if (currentState == State::Initialized) {
+		std::cerr << "Attempt to initialize mpv twice" << std::endl;
+		return;
+	}
 
 	this->wid = wid;
 	mpv_set_option(mpv, "wid", MPV_FORMAT_INT64, &wid);
@@ -43,10 +48,33 @@ void MpvHandleWrapper::initialize(int64_t wid) {
 
 void MpvHandleWrapper::load(const std::string &filename) {
 
-	const char *command[] = { "loadfile", filename.c_str(), nullptr, nullptr };
+	if (currentState != State::Initialized) {
+		std::cerr << "load(): mpv handler not initialized" << std::endl;
+		return;
+	}
+
+	const char *command[] = { "loadfile", filename.c_str(), nullptr };
 	auto error = mpv_command(mpv, command);
-	if (error < 0)
-		throw std::runtime_error(mpv_error_string(error));
+	if (error < 0) {
+		std::cerr << "load() failed: " << mpv_error_string(error) << std::endl;
+		return;
+	}
+
+	currentState = State::Loaded;
+}
+
+void MpvHandleWrapper::seek(int percentage) {
+	if (currentState != State::Loaded) {
+		std::cerr << "seek(): you should load video before seek" << std::endl;
+		return;
+	}
+
+	const char *command[] = {"seek", std::to_string(percentage).c_str(), "absolute-percent", nullptr};
+	auto error = mpv_command_async(mpv, 0, command);
+	if (error < 0) {
+		std::cerr << "seek failed: " << mpv_error_string(error) << std::endl;
+		return;
+	}
 }
 
 MpvHandleWrapper::~MpvHandleWrapper() {

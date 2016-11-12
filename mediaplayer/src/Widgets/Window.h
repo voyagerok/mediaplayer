@@ -12,6 +12,7 @@
 #include "../Dialogs/IFileDialog.h"
 #include "MpvContainer.h"
 #include "../MpvHandleWrapper.h"
+#include "Slider.h"
 
 namespace Mediaplayer {
 
@@ -24,6 +25,7 @@ public:
 protected:
 	bool on_key_release(GdkEventKey*);
 	void on_realize() override;
+	void on_slider_value_changed();
 
 private:
 	void on_file_open();
@@ -35,6 +37,8 @@ private:
 	MpvContainer container;
 	bool isFullscreen = false;
 	MpvHandleWrapper mpvHandler;
+	Gtk::Box m_box;
+	Slider m_slider;
 };
 
 } /* namespace Mediaplayer */

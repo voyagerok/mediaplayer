@@ -19,10 +19,11 @@ public:
 	virtual ~MpvHandleWrapper();
 	void initialize(int64_t wid);
 	void load(const std::string &filename);
+	void seek(int percentage);
 private:
 	mpv_handle *mpv;
 	int64_t wid = -1;
-	enum class State {Allocated, Initialized};
+	enum class State {Allocated, Initialized, Loaded};
 	State currentState;
 };
 

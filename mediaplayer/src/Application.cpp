@@ -30,6 +30,9 @@ void Application::on_startup() {
 
 void Application::on_activate() {
 	Gtk::Application::on_activate();
+
+	auto appSettings = Gtk::Settings::get_default();
+	appSettings->property_gtk_application_prefer_dark_theme().set_value(true);
 }
 
 Glib::RefPtr<Application> Application::create(int argc, char **argv) {

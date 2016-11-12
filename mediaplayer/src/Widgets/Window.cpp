@@ -12,11 +12,17 @@
 namespace Mediaplayer {
 
 Window::Window() :
-		openFileDialog(new Gtk3FileDialog) {
+		openFileDialog(new Gtk3FileDialog), m_box { Gtk::ORIENTATION_VERTICAL }, m_slider {
+				Gtk::ORIENTATION_HORIZONTAL } {
 
 	set_default_size(800, 600);
 	set_title("Mediaplayer");
-	add(container);
+
+	m_slider.signal_value_changed().connect(sigc::mem_fun(*this, &Window::on_slider_value_changed));
+
+	m_box.pack_start(container, true, true, 0);
+	m_box.pack_start(m_slider, false, true, 10);
+	add(m_box);
 
 	add_action("fileopen", sigc::mem_fun(*this, &Window::on_file_open));
 	signal_key_release_event().connect(
@@ -71,5 +77,9 @@ void Window::on_realize() {
 	mpvHandler.initialize(container.get_wid());
 }
 
+void Window::on_slider_value_changed() {
+	auto currentValue = m_slider.get_value();
+	mpvHandler.seek(currentValue);
+}
 
 } /* namespace Mediaplayer */
