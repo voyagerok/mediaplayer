@@ -20,7 +20,9 @@ public:
 	virtual ~MpvHandleWrapper();
 	void initialize(int64_t wid);
 	void load(const std::string &filename);
-	void seek(int percentage);
+	void seek(int time);
+	void start_playback();
+	void pause_playback();
 
 	sigc::signal1<void,double> playback_progress_signal() { return m_playback_progress; }
 	sigc::signal<void,int> duration_signal() {return m_duration;}
@@ -34,7 +36,9 @@ private:
 	mpv_handle *mpv;
 	int64_t wid = -1;
 	enum class State {Allocated, Initialized, Loaded};
+	enum class PlaybackState {Started, Paused};
 	State currentState;
+	PlaybackState currentPlaybackState;
 
 	const char *percent_pos_prop_name = "percent-pos";
 	const char *duration_prop_name = "duration";

@@ -34,7 +34,7 @@ Slider::Slider(Gtk::Orientation orientation) :
 	set_margin_top(10);
 	set_draw_value(false);
 	set_increments(1, 1);
-	set_sensitive(false);
+	//set_sensitive(false);
 }
 
 } /* namespace Mediaplayer */

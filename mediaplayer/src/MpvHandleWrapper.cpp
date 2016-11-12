@@ -72,15 +72,16 @@ void MpvHandleWrapper::load(const std::string &filename) {
 	}
 
 	currentState = State::Loaded;
+	currentPlaybackState = PlaybackState::Started;
 }
 
-void MpvHandleWrapper::seek(int percentage) {
+void MpvHandleWrapper::seek(int time) {
 	if (currentState != State::Loaded) {
 		std::cerr << "seek(): you should load video before seek" << std::endl;
 		return;
 	}
 
-	const char *command[] = {"seek", std::to_string(percentage).c_str(), "absolute", nullptr};
+	const char *command[] = {"seek", std::to_string(time).c_str(), "absolute", nullptr};
 	auto error = mpv_command_async(mpv, 0, command);
 	if (error < 0) {
 		std::cerr << "seek failed: " << mpv_error_string(error) << std::endl;
@@ -90,7 +91,6 @@ void MpvHandleWrapper::seek(int percentage) {
 
 void MpvHandleWrapper::on_mpv_events() {
 
-	static int percent_pos_events_count = 0;
 	while (mpv) {
 		mpv_event *event = mpv_wait_event(mpv, 0);
 		if (event->event_id == MPV_EVENT_NONE)
@@ -98,12 +98,6 @@ void MpvHandleWrapper::on_mpv_events() {
 		switch (event->event_id) {
 		case MPV_EVENT_PROPERTY_CHANGE: {
 			mpv_event_property *prop = static_cast<mpv_event_property*>(event->data);
-//			if (strcmp(prop->name ,percent_pos_prop_name) == 0) {
-//				if (++percent_pos_events_count == 100) {
-//					playback_progress_signal().emit(*static_cast<double*>(prop->data));
-//					percent_pos_events_count = 0;
-//				}
-//			}
 			if (strcmp(prop->name, duration_prop_name) == 0) {
 				duration_signal().emit(*static_cast<int*>(prop->data));
 			}
@@ -112,6 +106,31 @@ void MpvHandleWrapper::on_mpv_events() {
 		default:
 			break;
 		}
+	}
+}
+
+void MpvHandleWrapper::start_playback() {
+	if (currentPlaybackState == PlaybackState::Paused) {
+		const char *command[] = {"keypress", "p", nullptr};
+		auto error = mpv_command_async(mpv, 0, command);
+		if (error < 0) {
+			std::cerr << "pause failed: " << mpv_error_string(error) << std::endl;
+			return;
+		}
+
+		currentPlaybackState = PlaybackState::Started;
+	}
+}
+
+void MpvHandleWrapper::pause_playback(){
+	if (currentPlaybackState == PlaybackState::Started) {
+		const char *command[] = {"keypress", "p", nullptr};
+		auto error = mpv_command_async(mpv, 0, command);
+		if (error < 0) {
+			std::cerr << "pause failed: " << mpv_error_string(error) << std::endl;
+			return;
+		}
+		currentPlaybackState = PlaybackState::Paused;
 	}
 }
 

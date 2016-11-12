@@ -13,17 +13,14 @@
 namespace Mediaplayer {
 
 Window::Window() :
-		openFileDialog(new Gtk3FileDialog), m_box { Gtk::ORIENTATION_VERTICAL }, m_slider {
-				Gtk::ORIENTATION_HORIZONTAL } {
+		openFileDialog(new Gtk3FileDialog), m_box { Gtk::ORIENTATION_VERTICAL } {
 
 	set_default_size(800, 600);
 	set_title("Mediaplayer");
 
-	m_slider.signal_value_changed().connect(
-			sigc::mem_fun(*this, &Window::on_slider_value_changed));
-
 	m_box.pack_start(container, true, true, 0);
-	m_box.pack_start(m_slider, false, true, 10);
+	//m_box.pack_start(m_slider, false, true, 10);
+	m_box.pack_start(controlPanel, false, true, 0);
 	add(m_box);
 
 	add_action("fileopen", sigc::mem_fun(*this, &Window::on_file_open));
@@ -34,6 +31,13 @@ Window::Window() :
 			sigc::mem_fun(*this, &Window::on_mpv_progress_signal));
 	mpvHandler.duration_signal().connect(
 			sigc::mem_fun(*this, &Window::on_mpv_duration_signal));
+
+	controlPanel.signal_slider_value_changed().connect(
+			sigc::mem_fun(*this, &Window::on_slider_value_changed));
+	controlPanel.signal_pause_button_clicked().connect(
+			sigc::mem_fun(*this, &Window::on_pause_command));
+	controlPanel.signal_start_button_clicked().connect(
+			sigc::mem_fun(*this, &Window::on_start_command));
 }
 
 void Window::load_file(const std::string &filename) {
@@ -85,19 +89,19 @@ void Window::on_realize() {
 }
 
 void Window::on_slider_value_changed() {
-	if (m_slider.get_left_mouse_button_pressed()) {
-		auto currentValue = m_slider.get_value();
+	if (controlPanel.get_slider_left_mbutton_pressed()) {
+		auto currentValue = controlPanel.get_slider_value();
 		mpvHandler.seek(floor(currentValue));
 	}
 }
 
 void Window::on_mpv_progress_signal(double value) {
-	m_slider.set_value(floor(value));
+	controlPanel.set_slider_value(floor(value));
 }
 
 void Window::on_mpv_duration_signal(int value) {
-	m_slider.set_sensitive(true);
-	m_slider.set_range(0, value);
+	controlPanel.set_sensitive(true);
+	controlPanel.set_slider_range(0, value);
 	sigc::slot<bool> update_slider_slot = sigc::bind(
 			sigc::mem_fun(*this, &Window::on_slider_update_timeout), 0);
 	update_slider_connection = Glib::signal_timeout().connect(
@@ -106,9 +110,9 @@ void Window::on_mpv_duration_signal(int value) {
 
 bool Window::on_slider_update_timeout(int) {
 
-	auto current = m_slider.get_value();
-	if (current < m_slider.get_adjustment()->get_upper()) {
-		m_slider.set_value(current + 1);
+	auto current = controlPanel.get_slider_value();
+	if (current < controlPanel.get_slider_upper()) {
+		controlPanel.set_slider_value(current + 1);
 		return true;
 	}
 	return false;

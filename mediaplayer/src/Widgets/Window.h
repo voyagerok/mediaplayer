@@ -13,6 +13,7 @@
 #include "MpvContainer.h"
 #include "../MpvHandleWrapper.h"
 #include "Slider.h"
+#include "ControlPanel.h"
 
 namespace Mediaplayer {
 
@@ -28,6 +29,8 @@ protected:
 	void on_slider_value_changed();
 	void on_mpv_progress_signal(double);
 	void on_mpv_duration_signal(int);
+	void on_pause_command() {mpvHandler.pause_playback();}
+	void on_start_command() {mpvHandler.start_playback();}
 
 private:
 	void on_file_open();
@@ -41,7 +44,8 @@ private:
 	bool isFullscreen = false;
 	MpvHandleWrapper mpvHandler;
 	Gtk::Box m_box;
-	Slider m_slider;
+	//Slider m_slider;
+	ControlPanel controlPanel;
 
 	sigc::connection update_slider_connection;
 };
