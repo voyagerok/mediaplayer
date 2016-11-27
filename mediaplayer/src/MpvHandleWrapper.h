@@ -23,6 +23,7 @@ public:
 	void seek(int time);
 	void start_playback();
 	void pause_playback();
+	int press_key(const char *key_name);
 
 	sigc::signal1<void,double> playback_progress_signal() { return m_playback_progress; }
 	sigc::signal<void,int> duration_signal() {return m_duration;}

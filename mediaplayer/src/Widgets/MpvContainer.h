@@ -14,9 +14,11 @@ namespace Mediaplayer {
 
 class MpvContainer: public Gtk::DrawingArea {
 public:
+	MpvContainer();
 	int64_t get_wid();
 protected:
 	bool on_draw(const Cairo::RefPtr<Cairo::Context> &cr) override;
+	void on_realize() override;
 };
 
 } /* namespace Mediaplayer */

@@ -11,6 +11,10 @@
 
 namespace Mediaplayer {
 
+MpvContainer::MpvContainer() : Gtk::DrawingArea() {
+	add_events(Gdk::EventMask::POINTER_MOTION_MASK);
+}
+
 int64_t MpvContainer::get_wid() {
 
 	std::cerr << "mpv_container realized: " << get_realized() << std::endl;
@@ -32,10 +36,20 @@ int64_t MpvContainer::get_wid() {
 
 bool MpvContainer::on_draw(const Cairo::RefPtr<Cairo::Context> &cr) {
 
+	//bool result = Gtk::DrawingArea::on_draw(cr);
+
 	auto allocation = get_allocation();
 	cr->rectangle(0, 0, allocation.get_width(), allocation.get_height());
 	cr->set_source_rgb(0, 0, 0);
 	cr->fill();
+
+//	return Gtk::DrawingArea::on_draw(cr);
+
+	return false;
+}
+
+void MpvContainer::on_realize() {
+	Gtk::DrawingArea::on_realize();
 }
 
 } /* namespace Mediaplayer */

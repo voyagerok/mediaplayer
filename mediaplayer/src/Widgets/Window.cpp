@@ -9,19 +9,32 @@
 #include "../Dialogs/Gtk3FileDialog.h"
 #include "../Application.h"
 #include <cmath>
+#include <iostream>
 
 namespace Mediaplayer {
 
-Window::Window() :
-		openFileDialog(new Gtk3FileDialog), m_box { Gtk::ORIENTATION_VERTICAL } {
+Window::Window(Glib::RefPtr<Gio::Menu> menu) :
+		Gtk::ApplicationWindow(), openFileDialog(new Gtk3FileDialog), menuBar {
+				menu } {
 
 	set_default_size(800, 600);
 	set_title("Mediaplayer");
 
-	m_box.pack_start(container, true, true, 0);
-	//m_box.pack_start(m_slider, false, true, 10);
-	m_box.pack_start(controlPanel, false, true, 0);
-	add(m_box);
+	controlPanelRevealer.add(controlPanel);
+	controlPanelRevealer.set_reveal_child(false);
+	controlPanelRevealer.set_valign(Gtk::ALIGN_END);
+
+	menuBarRevealer.add(menuBar);
+	menuBarRevealer.set_reveal_child(false);
+	menuBarRevealer.set_valign(Gtk::ALIGN_START);
+
+	videoArea.add(container);
+	videoArea.set_visible_child(container);
+
+	m_Overlay.add(videoArea);
+	m_Overlay.add_overlay(controlPanelRevealer);
+	m_Overlay.add_overlay(menuBarRevealer);
+	add(m_Overlay);
 
 	add_action("fileopen", sigc::mem_fun(*this, &Window::on_file_open));
 	signal_key_release_event().connect(
@@ -38,6 +51,12 @@ Window::Window() :
 			sigc::mem_fun(*this, &Window::on_pause_command));
 	controlPanel.signal_start_button_clicked().connect(
 			sigc::mem_fun(*this, &Window::on_start_command));
+
+	signal_button_press_event().connect(
+			sigc::mem_fun(*this, &Window::on_mpv_container_button_press));
+
+	container.signal_motion_notify_event().connect(
+			sigc::mem_fun(*this, &Window::on_mpv_container_motion_event));
 }
 
 void Window::load_file(const std::string &filename) {
@@ -65,9 +84,11 @@ bool Window::on_key_release(GdkEventKey *key) {
 	switch (keyvalUpper) {
 	case GDK_KEY_F:
 		toggle_fullscreen();
-		set_show_menubar(!isFullscreen);
+		//set_show_menubar(!isFullscreen);
+		//controlPanel.set_visible(!isFullscreen);
 		break;
 	default:
+		mpvHandler.press_key(key->string);
 		break;
 	}
 
@@ -81,6 +102,9 @@ void Window::toggle_fullscreen() {
 		unfullscreen();
 	}
 	isFullscreen = !isFullscreen;
+	controlPanelRevealer.set_reveal_child(!isFullscreen);
+	menuBarRevealer.set_reveal_child(!isFullscreen);
+	set_cursor_visibility(!isFullscreen);
 }
 
 void Window::on_realize() {
@@ -116,6 +140,92 @@ bool Window::on_slider_update_timeout(int) {
 		return true;
 	}
 	return false;
+}
+
+bool Window::on_hide_widgets_timeout(int) {
+	controlPanelRevealer.set_reveal_child(false);
+	menuBarRevealer.set_reveal_child(false);
+	set_cursor_visibility(false);
+	return false;
+}
+
+bool Window::on_mpv_container_button_press(GdkEventButton *eventButton) {
+	if (eventButton->type == GDK_2BUTTON_PRESS) {
+		//toggle_fullscreen();
+		//controlPanelRevealer.set_reveal_child(!controlPanelRevealer.get_reveal_child());
+		//menuBarRevealer.set_reveal_child(!menuBarRevealer.get_reveal_child());
+	}
+
+	return true;
+}
+
+bool Window::on_mpv_container_motion_event(GdkEventMotion *event) {
+	controlPanelRevealer.set_reveal_child();
+	menuBarRevealer.set_reveal_child();
+	set_cursor_visibility(true);
+
+	sigc::slot<bool> hide_widgets_slot = sigc::bind(sigc::mem_fun(*this, &Window::on_hide_widgets_timeout), 0);
+	hideWidgetsConnection.disconnect();
+	hideWidgetsConnection = Glib::signal_timeout().connect(hide_widgets_slot, 3000);
+
+	return true;
+}
+
+void Window::set_cursor_visibility(bool visible) {
+	Glib::RefPtr<Gdk::Window> window = get_window();
+	if (window) {
+		if (visible) {
+			window->set_cursor();
+		} else {
+			window->set_cursor(Gdk::Cursor::create(Gdk::CursorType::BLANK_CURSOR));
+		}
+	}
+}
+
+static gchar *get_full_keystr(guint keyval, guint state) {
+//	/* strlen("Ctrl+Alt+Shift+Meta+")+1 == 21 */
+//	const gsize max_modstr_len = 21;
+//	gchar modstr[max_modstr_len];
+//	gboolean found = FALSE;
+//	const gchar *keystr = gdk_keyval_name(keyval);
+//	const gchar *keystrmap[] = KEYSTRING_MAP;
+//	modstr[0] = '\0';
+//
+//	if((state&GDK_SHIFT_MASK) != 0)
+//	{
+//		g_strlcat(modstr, "Shift+", max_modstr_len);
+//	}
+//
+//	if((state&GDK_CONTROL_MASK) != 0)
+//	{
+//		g_strlcat(modstr, "Ctrl+", max_modstr_len);
+//	}
+//
+//	if((state&GDK_MOD1_MASK) != 0)
+//	{
+//		g_strlcat(modstr, "Alt+", max_modstr_len);
+//	}
+//
+//	if((state&GDK_META_MASK) != 0 || (state&GDK_SUPER_MASK) != 0)
+//	{
+//		g_strlcat(modstr, "Meta+", max_modstr_len);
+//	}
+//
+//	/* Translate GDK key name to mpv key name */
+//	for(gint i = 0; !found && keystrmap[i]; i += 2)
+//	{
+//		gint rc = g_ascii_strncasecmp(	keystr,
+//						keystrmap[i+1],
+//						KEYSTRING_MAX_LEN );
+//
+//		if(rc == 0)
+//		{
+//			keystr = keystrmap[i];
+//			found = TRUE;
+//		}
+//	}
+//
+//	return (strlen(keystr) > 0)?g_strconcat(modstr, keystr, NULL):NULL;
 }
 
 } /* namespace Mediaplayer */

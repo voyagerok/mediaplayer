@@ -19,7 +19,7 @@ namespace Mediaplayer {
 
 class Window: public Gtk::ApplicationWindow {
 public:
-	Window();
+	Window(Glib::RefPtr<Gio::Menu>);
 	int64_t get_mpv_container_wid();
 	void load_file(const std::string &filename);
 
@@ -31,11 +31,16 @@ protected:
 	void on_mpv_duration_signal(int);
 	void on_pause_command() {mpvHandler.pause_playback();}
 	void on_start_command() {mpvHandler.start_playback();}
+	bool on_mpv_container_button_press(GdkEventButton*);
+	bool on_mpv_container_motion_event(GdkEventMotion*);
 
 private:
 	void on_file_open();
 	void toggle_fullscreen();
 	bool on_slider_update_timeout(int);
+	uint64_t get_drawing_area_wid();
+	bool on_hide_widgets_timeout(int);
+	void set_cursor_visibility(bool);
 
 	using FileDialogPtr = std::unique_ptr<IFileDialog>;
 
@@ -43,11 +48,15 @@ private:
 	MpvContainer container;
 	bool isFullscreen = false;
 	MpvHandleWrapper mpvHandler;
-	Gtk::Box m_box;
-	//Slider m_slider;
 	ControlPanel controlPanel;
+	Gtk::Overlay m_Overlay;
+	Gtk::Revealer controlPanelRevealer;
+	Gtk::Revealer menuBarRevealer;
+	Gtk::MenuBar menuBar;
+	Gtk::Stack videoArea;
 
 	sigc::connection update_slider_connection;
+	sigc::connection hideWidgetsConnection;
 };
 
 } /* namespace Mediaplayer */

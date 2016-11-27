@@ -27,6 +27,9 @@ ControlPanel::ControlPanel() :
 	pack_start(buttonsPanel, false, true);
 	pack_start(m_Slider, true, true);
 
+	auto controlPanelStyleContext = get_style_context();
+	controlPanelStyleContext->add_class(GTK_STYLE_CLASS_BACKGROUND);
+
 	m_Slider.signal_value_changed().connect(
 			sigc::mem_fun(*this, &ControlPanel::on_slider_value_changed));
 	startButton.signal_clicked().connect(

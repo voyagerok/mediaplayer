@@ -13,7 +13,7 @@
 namespace Mediaplayer {
 
 Application::Application(int argc, char** argv) :
-		Gtk::Application(argc, argv, "org.apps.mediaplayer"), menuBar(
+		Gtk::Application(argc, argv, "org.apps.mediaplayer"), menuModel(
 				new MenuBarFactory), fileDialog { new Gtk3FileDialog } {
 	add_action("openinwindow",
 			sigc::mem_fun(*this, &Application::on_open_in_new_window));
@@ -21,9 +21,9 @@ Application::Application(int argc, char** argv) :
 
 void Application::on_startup() {
 	Gtk::Application::on_startup();
-	set_menubar(menuBar->CreateMenuInstance());
+	//set_menubar(menuBar->CreateMenuInstance());
 
-	Window *window { new Window };
+	Window *window { new Window(menuModel->CreateMenuInstance()) };
 	store_window(window);
 	window->show_all();
 }
@@ -44,7 +44,7 @@ void Application::on_open_in_new_window() {
 	if (auto window = get_active_window()) {
 		auto result = fileDialog->ShowDialog(*window);
 		if (result == DialogResult::Confirmed) {
-			Window *window { new Window };
+			Window *window { new Window(menuModel->CreateMenuInstance()) };
 			store_window(window);
 			window->load_file(fileDialog->GetFilename());
 			window->show_all();

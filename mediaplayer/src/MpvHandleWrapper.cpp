@@ -111,27 +111,29 @@ void MpvHandleWrapper::on_mpv_events() {
 
 void MpvHandleWrapper::start_playback() {
 	if (currentPlaybackState == PlaybackState::Paused) {
-		const char *command[] = {"keypress", "p", nullptr};
-		auto error = mpv_command_async(mpv, 0, command);
+		auto error = press_key("p");
 		if (error < 0) {
 			std::cerr << "pause failed: " << mpv_error_string(error) << std::endl;
 			return;
 		}
-
 		currentPlaybackState = PlaybackState::Started;
 	}
 }
 
 void MpvHandleWrapper::pause_playback(){
 	if (currentPlaybackState == PlaybackState::Started) {
-		const char *command[] = {"keypress", "p", nullptr};
-		auto error = mpv_command_async(mpv, 0, command);
+		auto error = press_key("p");
 		if (error < 0) {
 			std::cerr << "pause failed: " << mpv_error_string(error) << std::endl;
 			return;
 		}
 		currentPlaybackState = PlaybackState::Paused;
 	}
+}
+
+int MpvHandleWrapper::press_key(const char *key_name) {
+	const char *command[] = {"keypress", key_name, nullptr};
+	return mpv_command_async(mpv, 0, command);
 }
 
 MpvHandleWrapper::~MpvHandleWrapper() {

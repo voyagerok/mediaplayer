@@ -28,7 +28,7 @@ protected:
 private:
 	using MenuBarPtr = std::unique_ptr<IMenuFactory>;
 	using FileDialogPtr = std::unique_ptr<IFileDialog>;
-	MenuBarPtr menuBar;
+	MenuBarPtr menuModel;
 	FileDialogPtr fileDialog;
 
 	void store_window(Window *window);
