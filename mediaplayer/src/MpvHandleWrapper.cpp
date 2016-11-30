@@ -36,16 +36,26 @@ void MpvHandleWrapper::initialize(int64_t wid) {
 	this->wid = wid;
 	mpv_set_option(mpv, "wid", MPV_FORMAT_INT64, &wid);
 
-	// Enable default bindings, because we're lazy. Normally, a player using
-	// mpv as backend would implement its own key bindings.
-	mpv_set_option_string(mpv, "input-default-bindings", "yes");
+	struct defaullt_options {
+		const char *name;
+		const char *value;
+	} options[] = {
+			{"idle", "yes"},
+			{"input-default-bindings", "yes"},
+			{"input-cursor", "no"},
+			{"cursor-autohide", "no"},
+			{NULL, NULL}
+	};
 
-	// Enable keyboard input on the X11 window. For the messy details, see
-	// --input-vo-keyboard on the manpage.
-	mpv_set_option_string(mpv, "input-vo-keyboard", "yes");
+	for (int i = 0; options[i].name; ++i) {
+		mpv_set_option_string(mpv, options[i].name, options[i].value);
+	}
 
-	mpv_observe_property(mpv, 0, percent_pos_prop_name, MPV_FORMAT_DOUBLE);
-	mpv_observe_property(mpv, 0, duration_prop_name, MPV_FORMAT_INT64);
+	mpv_observe_property(mpv, 0, percent_pos_property_name, MPV_FORMAT_DOUBLE);
+	mpv_observe_property(mpv, 0, duration_property_name, MPV_FORMAT_INT64);
+	mpv_observe_property(mpv, 0, time_pos_property_name, MPV_FORMAT_DOUBLE);
+	mpv_observe_property(mpv, 0, time_remaining_property_name, MPV_FORMAT_DOUBLE);
+	mpv_observe_property(mpv, 0, media_title_property_name, MPV_FORMAT_STRING);
 
 	mpv_events().connect(sigc::mem_fun(*this, &MpvHandleWrapper::on_mpv_events));
 	mpv_set_wakeup_callback(mpv, wakeup_callback, this);
@@ -59,10 +69,12 @@ void MpvHandleWrapper::initialize(int64_t wid) {
 
 void MpvHandleWrapper::load(const std::string &filename) {
 
-	if (currentState != State::Initialized) {
+	if (currentState != State::Initialized && currentState != State::Loaded) {
 		std::cerr << "load(): mpv handler not initialized" << std::endl;
 		return;
 	}
+
+	currentState = State::Initialized;
 
 	const char *command[] = { "loadfile", filename.c_str(), nullptr };
 	auto error = mpv_command(mpv, command);
@@ -96,11 +108,52 @@ void MpvHandleWrapper::on_mpv_events() {
 		if (event->event_id == MPV_EVENT_NONE)
 			break;
 		switch (event->event_id) {
-		case MPV_EVENT_PROPERTY_CHANGE: {
+		case MPV_EVENT_PROPERTY_CHANGE:
+		{
 			mpv_event_property *prop = static_cast<mpv_event_property*>(event->data);
-			if (strcmp(prop->name, duration_prop_name) == 0) {
-				duration_signal().emit(*static_cast<int*>(prop->data));
+			if (strcmp(prop->name, duration_property_name) == 0)
+			{
+//				if (prop->data) {
+//					duration_signal().emit(*static_cast<int*>(prop->data));
+//				}
+				auto duration = static_cast<int*>(prop->data);
+				if (duration) {
+					duration_signal().emit(*duration);
+				}
 			}
+			else if (strcmp(prop->name, time_pos_property_name) == 0)
+			{
+				if (currentState == State::Loaded) {
+					auto time_pos = static_cast<double*>(prop->data);
+					if (time_pos) {
+						playback_progress_signal().emit(*time_pos);
+					}
+				}
+			}
+			else if (strcmp(prop->name, time_remaining_property_name) == 0)
+			{
+				if (currentState == State::Loaded) {
+					auto remaining_time = static_cast<double*>(prop->data);
+					if (remaining_time && *remaining_time < 1) {
+						end_of_file_signal().emit();
+						seek(0);
+						pause_playback();
+					}
+				}
+			}
+			else if (strcmp(prop->name, media_title_property_name) == 0)
+			{
+				if (currentState == State::Loaded) {
+					char **media_title = static_cast<char**>(prop->data);
+					if (media_title) {
+						media_title_changed_signal().emit(*media_title);
+					}
+				}
+			}
+			break;
+		}
+		case MPV_EVENT_END_FILE:
+		{
 			break;
 		}
 		default:
@@ -129,6 +182,19 @@ void MpvHandleWrapper::pause_playback(){
 		}
 		currentPlaybackState = PlaybackState::Paused;
 	}
+}
+
+std::string MpvHandleWrapper::get_media_title() {
+	if (currentState == State::Loaded) {
+		char *media_title = mpv_get_property_string(mpv, "media-title");
+		if (media_title) {
+			auto result = std::string{media_title};
+			mpv_free(media_title);
+			return result;
+		}
+	}
+
+	return "";
 }
 
 int MpvHandleWrapper::press_key(const char *key_name) {

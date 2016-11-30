@@ -29,6 +29,8 @@ protected:
 	void on_slider_value_changed();
 	void on_mpv_progress_signal(double);
 	void on_mpv_duration_signal(int);
+	void on_mpv_eof_signal();
+	void on_mpv_media_title_signal(const std::string&);
 	void on_pause_command() {mpvHandler.pause_playback();}
 	void on_start_command() {mpvHandler.start_playback();}
 	bool on_mpv_container_button_press(GdkEventButton*);

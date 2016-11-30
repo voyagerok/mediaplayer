@@ -44,6 +44,10 @@ Window::Window(Glib::RefPtr<Gio::Menu> menu) :
 			sigc::mem_fun(*this, &Window::on_mpv_progress_signal));
 	mpvHandler.duration_signal().connect(
 			sigc::mem_fun(*this, &Window::on_mpv_duration_signal));
+	mpvHandler.end_of_file_signal().connect(
+			sigc::mem_fun(*this, &Window::on_mpv_eof_signal));
+	mpvHandler.media_title_changed_signal().connect(
+			sigc::mem_fun(*this, &Window::on_mpv_media_title_signal));
 
 	controlPanel.signal_slider_value_changed().connect(
 			sigc::mem_fun(*this, &Window::on_slider_value_changed));
@@ -54,8 +58,7 @@ Window::Window(Glib::RefPtr<Gio::Menu> menu) :
 
 	signal_button_press_event().connect(
 			sigc::mem_fun(*this, &Window::on_mpv_container_button_press));
-
-	container.signal_motion_notify_event().connect(
+	signal_motion_notify_event().connect(
 			sigc::mem_fun(*this, &Window::on_mpv_container_motion_event));
 }
 
@@ -63,13 +66,14 @@ void Window::load_file(const std::string &filename) {
 	if (!get_realized())
 		realize();
 	mpvHandler.load(filename);
+	//set_title(mpvHandler.get_media_title());
 }
 
 void Window::on_file_open() {
 	auto result = openFileDialog->ShowDialog(*this);
 	if (result == DialogResult::Confirmed) {
 		std::string filename = openFileDialog->GetFilename();
-		mpvHandler.load(filename);
+		load_file(filename);
 	}
 }
 
@@ -120,16 +124,16 @@ void Window::on_slider_value_changed() {
 }
 
 void Window::on_mpv_progress_signal(double value) {
-	controlPanel.set_slider_value(floor(value));
+	controlPanel.set_slider_value(static_cast<int>(value));
 }
 
 void Window::on_mpv_duration_signal(int value) {
 	controlPanel.set_sensitive(true);
 	controlPanel.set_slider_range(0, value);
-	sigc::slot<bool> update_slider_slot = sigc::bind(
-			sigc::mem_fun(*this, &Window::on_slider_update_timeout), 0);
-	update_slider_connection = Glib::signal_timeout().connect(
-			update_slider_slot, 1000);
+//	sigc::slot<bool> update_slider_slot = sigc::bind(
+//			sigc::mem_fun(*this, &Window::on_slider_update_timeout), 0);
+//	update_slider_connection = Glib::signal_timeout().connect(
+//			update_slider_slot, 1000);
 }
 
 bool Window::on_slider_update_timeout(int) {
@@ -151,9 +155,7 @@ bool Window::on_hide_widgets_timeout(int) {
 
 bool Window::on_mpv_container_button_press(GdkEventButton *eventButton) {
 	if (eventButton->type == GDK_2BUTTON_PRESS) {
-		//toggle_fullscreen();
-		//controlPanelRevealer.set_reveal_child(!controlPanelRevealer.get_reveal_child());
-		//menuBarRevealer.set_reveal_child(!menuBarRevealer.get_reveal_child());
+		toggle_fullscreen();
 	}
 
 	return true;
@@ -180,6 +182,14 @@ void Window::set_cursor_visibility(bool visible) {
 			window->set_cursor(Gdk::Cursor::create(Gdk::CursorType::BLANK_CURSOR));
 		}
 	}
+}
+
+void Window::on_mpv_eof_signal() {
+	controlPanel.set_slider_value(0);
+}
+
+void Window::on_mpv_media_title_signal(const std::string &new_title) {
+	set_title(new_title);
 }
 
 static gchar *get_full_keystr(guint keyval, guint state) {

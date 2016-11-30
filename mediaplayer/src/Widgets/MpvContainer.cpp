@@ -50,6 +50,10 @@ bool MpvContainer::on_draw(const Cairo::RefPtr<Cairo::Context> &cr) {
 
 void MpvContainer::on_realize() {
 	Gtk::DrawingArea::on_realize();
+//	auto window = get_window();
+//	if (window) {
+//		window->set_pass_through();
+//	}
 }
 
 } /* namespace Mediaplayer */
