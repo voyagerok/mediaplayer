@@ -44,7 +44,7 @@ Window::Window(Glib::RefPtr<Gio::Menu> menu) :
 			sigc::mem_fun(*this, &Window::on_mpv_duration_signal));
 	mpvHandler.signal_state_idle().connect(
 			sigc::mem_fun(*this, &Window::on_mpv_idle_signal));
-	mpvHandler.media_title_changed_signal().connect(
+	mpvHandler.signal_media_title_changed().connect(
 			sigc::mem_fun(*this, &Window::on_mpv_media_title_signal));
 
 	controlPanel.signal_slider_value_changed().connect(
