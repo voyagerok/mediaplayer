@@ -58,7 +58,6 @@ void MpvHandleWrapper::initialize(int64_t wid) {
 	mpv_observe_property(mpv, 0, time_pos_property_name, MPV_FORMAT_DOUBLE);
 	mpv_observe_property(mpv, 0, media_title_property_name, MPV_FORMAT_STRING);
 	mpv_observe_property(mpv, 0, fullscreen_property_name, MPV_FORMAT_FLAG);
-	mpv_observe_property(mpv, 0, filename_property_name, MPV_FORMAT_STRING);
 
 	mpv_events().connect(sigc::mem_fun(*this, &MpvHandleWrapper::on_mpv_events));
 	mpv_set_wakeup_callback(mpv, wakeup_callback, this);
@@ -128,26 +127,15 @@ void MpvHandleWrapper::on_mpv_events() {
 			}
 			else if (strcmp(prop->name, media_title_property_name) == 0)
 			{
-				if (currentState == State::Loaded) {
-					char **media_title = static_cast<char**>(prop->data);
-					if (media_title) {
-						signal_media_title_changed().emit(*media_title);
-					}
+				char **media_title = static_cast<char**>(prop->data);
+				if (media_title) {
+					signal_media_title_changed().emit(*media_title);
 				}
 			}
 			else if (strcmp(prop->name, fullscreen_property_name) == 0)
 			{
 				if (currentState == State::Loaded) {
 					signal_fullscreen().emit();
-				}
-			}
-			else if (strcmp(prop->name, filename_property_name) == 0)
-			{
-				if (currentState == State::Loaded) {
-					auto filename = static_cast<char**>(prop->data);
-					if (filename) {
-						signal_filename_changed().emit(*filename);
-					}
 				}
 			}
 			break;

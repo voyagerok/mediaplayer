@@ -33,7 +33,6 @@ public:
 	sigc::signal<void,std::string> signal_media_title_changed() { return m_media_title_changed; }
 	sigc::signal<void> signal_fullscreen() { return m_fullscreen; }
 	sigc::signal<void> signal_file_loaded() { return m_file_loaded; }
-	sigc::signal<void,std::string> signal_filename_changed() { return m_filename_changed; }
 
 	Glib::Dispatcher& mpv_events() {return m_mpv_events;}
 private:
@@ -43,12 +42,12 @@ private:
 	sigc::signal<void, std::string> m_media_title_changed;
 	sigc::signal<void> m_fullscreen;
 	sigc::signal<void> m_file_loaded;
-	sigc::signal<void,std::string> m_filename_changed;
 
 	Glib::Dispatcher m_mpv_events;
 
 	mpv_handle *mpv;
 	int64_t wid = -1;
+
 	enum class State {Allocated, Initialized, Loaded};
 	enum class PlaybackState {Started, Paused, Undefined};
 	State currentState;
@@ -60,7 +59,6 @@ private:
 	const char *time_remaining_property_name = "time-remaining";
 	const char *media_title_property_name = "media-title";
 	const char *fullscreen_property_name = "fullscreen";
-	const char *filename_property_name = "filename";
 
 	void on_mpv_events();
 };

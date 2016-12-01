@@ -6,8 +6,13 @@
  */
 
 #include "ControlPanel.h"
+#include <sstream>
+#include <chrono>
+#include <iomanip>
 
 namespace Mediaplayer {
+
+static std::string format_time(int,int);
 
 ControlPanel::ControlPanel() :
 		Gtk::Box { Gtk::ORIENTATION_HORIZONTAL }, buttonsPanel {
@@ -24,8 +29,13 @@ ControlPanel::ControlPanel() :
 	buttonsPanel.set_margin_right(10);
 	buttonsPanel.set_margin_left(10);
 
+	timeLabel.set_text("00:00:00 / 00:00:00");
+	timeLabel.set_margin_right(10);
+	timeLabel.set_margin_left(10);
+
 	pack_start(buttonsPanel, false, true);
 	pack_start(m_Slider, true, true);
+	pack_start(timeLabel, false, true);
 
 	auto controlPanelStyleContext = get_style_context();
 	controlPanelStyleContext->add_class(GTK_STYLE_CLASS_BACKGROUND);
@@ -48,6 +58,40 @@ void ControlPanel::on_start_button_clicked() {
 
 void ControlPanel::on_pause_button_clicked() {
 	signal_pause_button_clicked().emit();
+}
+
+void ControlPanel::set_overall_time(int overall_time) {
+	m_overall_hours = overall_time / 3600;
+	int remaining = overall_time % 3600;
+	m_overall_minutes = remaining / 60;
+	m_overall_seconds = remaining % 60;
+}
+
+void ControlPanel::set_current_time(int current_time) {
+	int current_hours = current_time / 3600;
+	int remaining = current_time % 3600;
+	int current_minutes = remaining / 60;
+	int current_seconds = remaining % 60;
+
+//	using T = std::tuple<int,int,std::string>;
+//	T components[] = {
+//			{current_hours, 2, ""},
+//			{current_minutes, 2, ":"},
+//			{current_seconds, 2, ":"},
+//			{m_overall_hours, 2, "/"},
+//			{m_overall_minutes, 2, ":"},
+//			{m_overall_seconds, 2, ":"}
+//	};
+
+	std::ostringstream stream;
+	stream << std::setw(2) << std::setfill('0') << current_hours;
+	stream << ":" << std::setw(2) << std::setfill('0') << current_minutes;
+	stream << ":" << std::setw(2) << std::setfill('0') << current_seconds;
+	stream << " / " << std::setw(2) << std::setfill('0') << m_overall_hours;
+	stream << ":" << std::setw(2) << std::setfill('0') << m_overall_minutes;
+	stream << ":" << std::setw(2) << std::setfill('0') << m_overall_seconds;
+
+	timeLabel.set_text(stream.str());
 }
 
 } /* namespace Mediaplayer */

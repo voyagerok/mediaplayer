@@ -127,12 +127,15 @@ void Window::on_slider_value_changed() {
 }
 
 void Window::on_mpv_progress_signal(double value) {
-	controlPanel.set_slider_value(static_cast<int>(value));
+	auto seconds = static_cast<int>(value);
+	controlPanel.set_slider_value(seconds);
+	controlPanel.set_current_time(seconds);
 }
 
 void Window::on_mpv_duration_signal(int value) {
 	controlPanel.set_sensitive(true);
 	controlPanel.set_slider_range(0, value);
+	controlPanel.set_overall_time(value);
 }
 
 void Window::on_mpv_fullscreen_signal() {

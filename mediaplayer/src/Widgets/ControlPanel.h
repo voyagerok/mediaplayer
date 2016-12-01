@@ -21,15 +21,22 @@ public:
 	double get_slider_upper() {return m_Slider.get_adjustment()->get_upper();}
 	bool get_slider_left_mbutton_pressed() {return m_Slider.get_left_mouse_button_pressed();}
 	void set_slider_range(double lower, double upper) {m_Slider.set_range(lower, upper);}
+	void set_overall_time(int);
+	void set_current_time(int);
 
 	sigc::signal<void> signal_slider_value_changed() {return m_signal_slider_value_changed;}
 	sigc::signal<void> signal_start_button_clicked() {return m_signal_on_start_button_clicked;}
 	sigc::signal<void> signal_pause_button_clicked() {return m_signal_on_pause_button_clicked;}
 private:
+	int m_overall_hours;
+	int m_overall_minutes;
+	int m_overall_seconds;
+
 	Slider m_Slider;
 	Gtk::Button startButton;
 	Gtk::Button pauseButton;
 	Gtk::Box buttonsPanel;
+	Gtk::Label timeLabel;
 
 	sigc::signal<void> m_signal_slider_value_changed;
 	sigc::signal<void> m_signal_on_start_button_clicked;
