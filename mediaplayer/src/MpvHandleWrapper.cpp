@@ -24,6 +24,7 @@ MpvHandleWrapper::MpvHandleWrapper() {
 		throw std::runtime_error("mpv_create() failed");
 
 	currentState = State::Allocated;
+	currentPlaybackState = PlaybackState::Undefined;
 }
 
 void MpvHandleWrapper::initialize(int64_t wid) {
@@ -40,6 +41,7 @@ void MpvHandleWrapper::initialize(int64_t wid) {
 		const char *name;
 		const char *value;
 	} options[] = {
+			{"osd-level", "1"},
 			{"idle", "yes"},
 			{"input-default-bindings", "yes"},
 			{"input-cursor", "no"},
@@ -54,8 +56,8 @@ void MpvHandleWrapper::initialize(int64_t wid) {
 	mpv_observe_property(mpv, 0, percent_pos_property_name, MPV_FORMAT_DOUBLE);
 	mpv_observe_property(mpv, 0, duration_property_name, MPV_FORMAT_INT64);
 	mpv_observe_property(mpv, 0, time_pos_property_name, MPV_FORMAT_DOUBLE);
-	mpv_observe_property(mpv, 0, time_remaining_property_name, MPV_FORMAT_DOUBLE);
 	mpv_observe_property(mpv, 0, media_title_property_name, MPV_FORMAT_STRING);
+	mpv_observe_property(mpv, 0, fullscreen_property_name, MPV_FORMAT_FLAG);
 
 	mpv_events().connect(sigc::mem_fun(*this, &MpvHandleWrapper::on_mpv_events));
 	mpv_set_wakeup_callback(mpv, wakeup_callback, this);
@@ -69,11 +71,10 @@ void MpvHandleWrapper::initialize(int64_t wid) {
 
 void MpvHandleWrapper::load(const std::string &filename) {
 
-	if (currentState != State::Initialized && currentState != State::Loaded) {
+	if (currentState == State::Allocated) {
 		std::cerr << "load(): mpv handler not initialized" << std::endl;
 		return;
 	}
-
 	currentState = State::Initialized;
 
 	const char *command[] = { "loadfile", filename.c_str(), nullptr };
@@ -82,9 +83,6 @@ void MpvHandleWrapper::load(const std::string &filename) {
 		std::cerr << "load() failed: " << mpv_error_string(error) << std::endl;
 		return;
 	}
-
-	currentState = State::Loaded;
-	currentPlaybackState = PlaybackState::Started;
 }
 
 void MpvHandleWrapper::seek(int time) {
@@ -113,12 +111,9 @@ void MpvHandleWrapper::on_mpv_events() {
 			mpv_event_property *prop = static_cast<mpv_event_property*>(event->data);
 			if (strcmp(prop->name, duration_property_name) == 0)
 			{
-//				if (prop->data) {
-//					duration_signal().emit(*static_cast<int*>(prop->data));
-//				}
 				auto duration = static_cast<int*>(prop->data);
 				if (duration) {
-					duration_signal().emit(*duration);
+					signal_duration().emit(*duration);
 				}
 			}
 			else if (strcmp(prop->name, time_pos_property_name) == 0)
@@ -126,18 +121,7 @@ void MpvHandleWrapper::on_mpv_events() {
 				if (currentState == State::Loaded) {
 					auto time_pos = static_cast<double*>(prop->data);
 					if (time_pos) {
-						playback_progress_signal().emit(*time_pos);
-					}
-				}
-			}
-			else if (strcmp(prop->name, time_remaining_property_name) == 0)
-			{
-				if (currentState == State::Loaded) {
-					auto remaining_time = static_cast<double*>(prop->data);
-					if (remaining_time && *remaining_time < 1) {
-						end_of_file_signal().emit();
-						seek(0);
-						pause_playback();
+						signal_playback_progress().emit(*time_pos);
 					}
 				}
 			}
@@ -150,6 +134,26 @@ void MpvHandleWrapper::on_mpv_events() {
 					}
 				}
 			}
+			else if (strcmp(prop->name, fullscreen_property_name) == 0)
+			{
+				if (currentState == State::Loaded) {
+					signal_fullscreen().emit();
+				}
+			}
+			break;
+		}
+		case MPV_EVENT_IDLE:
+		{
+			signal_state_idle().emit();
+			currentPlaybackState = PlaybackState::Undefined;
+			currentState = State::Initialized;
+			break;
+		}
+		case MPV_EVENT_FILE_LOADED:
+		{
+			signal_file_loaded().emit();
+			currentState = State::Loaded;
+			currentPlaybackState = PlaybackState::Started;
 			break;
 		}
 		case MPV_EVENT_END_FILE:
@@ -184,21 +188,18 @@ void MpvHandleWrapper::pause_playback(){
 	}
 }
 
-std::string MpvHandleWrapper::get_media_title() {
-	if (currentState == State::Loaded) {
-		char *media_title = mpv_get_property_string(mpv, "media-title");
-		if (media_title) {
-			auto result = std::string{media_title};
-			mpv_free(media_title);
-			return result;
-		}
-	}
-
-	return "";
-}
-
 int MpvHandleWrapper::press_key(const char *key_name) {
 	const char *command[] = {"keypress", key_name, nullptr};
+	return mpv_command_async(mpv, 0, command);
+}
+
+int MpvHandleWrapper::key_down(const char *key_name) {
+	const char *command[] = {"keydown", key_name, nullptr};
+	return mpv_command_async(mpv, 0, command);
+}
+
+int MpvHandleWrapper::key_up(const char *key_name) {
+	const char *command[] = {"keyup", key_name, nullptr};
 	return mpv_command_async(mpv, 0, command);
 }
 
