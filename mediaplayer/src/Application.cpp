@@ -8,6 +8,7 @@
 #include "Application.h"
 #include "Factories/MenuBarFactory.h"
 #include "Dialogs/Gtk3FileDialog.h"
+#include "Views/mediaplayer_views.h"
 #include <iostream>
 
 namespace Mediaplayer {
@@ -30,6 +31,7 @@ void Application::on_startup() {
 
 void Application::on_activate() {
 	Gtk::Application::on_activate();
+	g_resources_register(mediaplayer_views_get_resource());
 
 	auto appSettings = Gtk::Settings::get_default();
 	appSettings->property_gtk_application_prefer_dark_theme().set_value(true);

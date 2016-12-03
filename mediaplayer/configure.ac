@@ -6,7 +6,7 @@ AC_INIT(mediaplayer, 1.0)
 CXXFLAGS='-g3 -O0 -pipe'
 
 AC_CANONICAL_SYSTEM
-AM_INIT_AUTOMAKE([subdir-objects])
+AM_INIT_AUTOMAKE([subdir-objects -Wno-portability])
 
 LT_INIT
 
@@ -20,6 +20,7 @@ AC_CONFIG_FILES([
 	src/Dialogs/Makefile 
 	src/Factories/Makefile
 	src/Utils/Makefile
+	src/Views/Makefile
 ])
 AC_OUTPUT
 

@@ -1,4 +1,4 @@
-noinst_LTLIBRARIES = libmediaplayer-widgets.la
+noinst_LTLIBRARIES = libmediaplayer_widgets.la
 libmediaplayer_widgets_la_SOURCES = Window.cpp \
                             MpvContainer.cpp \
                             Slider.cpp \

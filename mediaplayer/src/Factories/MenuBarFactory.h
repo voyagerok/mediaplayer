@@ -16,7 +16,7 @@ class MenuBarFactory: public IMenuFactory {
 public:
 	Glib::RefPtr<Gio::Menu> CreateMenuInstance() override;
 private:
-	const std::string menubarViewFilename = "src/Views/Menubar.xml";
+	const std::string menubarResourcePath = "/org/apps/mediaplayer/Menubar.xml";
 	const std::string menubarObjectId = "MenuBar";
 };
 

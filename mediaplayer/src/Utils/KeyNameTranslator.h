@@ -8,6 +8,8 @@
 #ifndef UTILS_KEYNAMETRANSLATOR_H_
 #define UTILS_KEYNAMETRANSLATOR_H_
 
+#include <string>
+
 namespace Mediaplayer{
 namespace KeyNameTranslator {
 

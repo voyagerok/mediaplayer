@@ -15,7 +15,7 @@ Glib::RefPtr<Gio::Menu> MenuBarFactory::CreateMenuInstance() {
 	Glib::RefPtr<Gtk::Builder> builder;
 
 	try {
-		builder = Gtk::Builder::create_from_file(menubarViewFilename);
+		builder = Gtk::Builder::create_from_resource(menubarResourcePath);
 	} catch (const Glib::FileError &fileError) {
 		std::cerr << "FileError: " << fileError.what() << std::endl;
 	} catch (const Gtk::BuilderError &builderError) {

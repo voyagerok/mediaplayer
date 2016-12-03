@@ -80,8 +80,6 @@ int64_t Window::get_mpv_container_wid() {
 	return container.get_wid();
 }
 
-//static std::string get_full_keystr(guint keyval,guint state);
-
 bool Window::on_key_release_event(GdkEventKey *key) {
 
 	Gtk::ApplicationWindow::on_key_release_event(key);
