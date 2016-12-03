@@ -23,6 +23,7 @@ public:
 	void set_slider_range(double lower, double upper) {m_Slider.set_range(lower, upper);}
 	void set_overall_time(int);
 	void set_current_time(int);
+	void set_time_default();
 
 	sigc::signal<void> signal_slider_value_changed() {return m_signal_slider_value_changed;}
 	sigc::signal<void> signal_start_button_clicked() {return m_signal_on_start_button_clicked;}
@@ -45,6 +46,8 @@ private:
 	void on_slider_value_changed();
 	void on_start_button_clicked();
 	void on_pause_button_clicked();
+
+	const char *time_default_string = "00:00:00 / 00:00:00";
 };
 
 } /* namespace Mediaplayer */

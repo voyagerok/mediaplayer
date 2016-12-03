@@ -8,6 +8,7 @@
 #include "Window.h"
 #include "../Dialogs/Gtk3FileDialog.h"
 #include "../Application.h"
+#include "../Utils/KeyNameTranslator.h"
 #include <cmath>
 #include <iostream>
 
@@ -34,6 +35,7 @@ Window::Window(Glib::RefPtr<Gio::Menu> menu) :
 	m_Overlay.add(videoArea);
 	m_Overlay.add_overlay(controlPanelRevealer);
 	m_Overlay.add_overlay(menuBarRevealer);
+
 	add(m_Overlay);
 
 	add_action("fileopen", sigc::mem_fun(*this, &Window::on_file_open));
@@ -78,19 +80,21 @@ int64_t Window::get_mpv_container_wid() {
 	return container.get_wid();
 }
 
-static gchar *get_full_keystr(guint keyval,guint state);
+//static std::string get_full_keystr(guint keyval,guint state);
 
 bool Window::on_key_release_event(GdkEventKey *key) {
 
 	Gtk::ApplicationWindow::on_key_release_event(key);
-	mpvHandler.key_up(get_full_keystr(key->keyval, key->state));
+	std::string mpv_keyname = KeyNameTranslator::translate_from_gdk_to_mpv(key->keyval, key->state);
+	mpvHandler.key_up(mpv_keyname.c_str());
 	show_control_widgets();
 	return true;
 }
 
 bool Window::on_key_press_event(GdkEventKey *key) {
 	Gtk::ApplicationWindow::on_key_press_event(key);
-	mpvHandler.key_down(get_full_keystr(key->keyval, key->state));
+	std::string mpv_keyname = KeyNameTranslator::translate_from_gdk_to_mpv(key->keyval, key->state);
+	mpvHandler.key_down(mpv_keyname.c_str());
 	show_control_widgets();
 	return true;
 }
@@ -102,6 +106,7 @@ void Window::toggle_fullscreen() {
 		unfullscreen();
 	}
 	isFullscreen = !isFullscreen;
+	hideWidgetsTimer.disconnect();
 	controlPanelRevealer.set_reveal_child(!isFullscreen);
 	menuBarRevealer.set_reveal_child(!isFullscreen);
 	set_cursor_visibility(!isFullscreen);
@@ -112,6 +117,8 @@ void Window::set_idle_state() {
 	set_title(default_title);
 	controlPanel.set_slider_value(0);
 	if (isFullscreen) toggle_fullscreen();
+	controlPanel.set_time_default();
+	controlPanel.set_sensitive(false);
 }
 
 void Window::on_realize() {
@@ -122,7 +129,7 @@ void Window::on_realize() {
 void Window::on_slider_value_changed() {
 	if (controlPanel.get_slider_left_mbutton_pressed()) {
 		auto currentValue = controlPanel.get_slider_value();
-		mpvHandler.seek(floor(currentValue));
+		mpvHandler.seek(static_cast<int>(currentValue));
 	}
 }
 
@@ -174,8 +181,8 @@ void Window::show_control_widgets() {
 	set_cursor_visibility(true);
 
 	sigc::slot<bool> hide_widgets_slot = sigc::bind(sigc::mem_fun(*this, &Window::on_hide_widgets_timeout), 0);
-	hideWidgetsConnection.disconnect();
-	hideWidgetsConnection = Glib::signal_timeout().connect(hide_widgets_slot, 3000);
+	hideWidgetsTimer.disconnect();
+	hideWidgetsTimer = Glib::signal_timeout().connect(hide_widgets_slot, 3000);
 }
 
 bool Window::on_mpv_container_motion_event(GdkEventMotion *event) {
@@ -201,104 +208,6 @@ void Window::on_mpv_idle_signal() {
 
 void Window::on_mpv_media_title_signal(const std::string &new_title) {
 	set_title(new_title);
-}
-
-#define KEYSTRING_MAP	{	"<", "less",\
-				">", "greater",\
-				"PGUP", "Page_Up",\
-				"PGDWN", "Page_Down",\
-				"BS", "BackSpace",\
-				".", "period",\
-				",", "comma",\
-				"`", "grave",\
-				"~", "asciitilde",\
-				"!", "exclam",\
-				"@", "at",\
-				"SHARP", "numbersign",\
-				"$", "dollar",\
-				"%", "percent",\
-				"^", "caret",\
-				"&", "ampersand",\
-				"*", "asterisk",\
-				"-", "minus",\
-				"_", "underscore",\
-				"=", "equal",\
-				"+", "plus",\
-				";", "semicolon",\
-				":", "colon",\
-				"'", "apostrophe",\
-				"\"", "quotedbl",\
-				"/", "slash",\
-				"\\", "backslash",\
-				"(", "parenleft",\
-				")", "parenright",\
-				"[", "bracketleft",\
-				"]", "bracketright",\
-				"?", "question",\
-				"RIGHT", "Right",\
-				"LEFT", "Left",\
-				"UP", "Up",\
-				"DOWN", "Down",\
-				"ESC", "Escape",\
-				"DEL", "Delete",\
-				"ENTER", "Return",\
-				"INS", "Insert",\
-				"", "Control_L",\
-				"", "Control_R",\
-				"", "Alt_L",\
-				"", "Alt_R",\
-				"", "Meta_L",\
-				"", "Meta_R",\
-				"", "Shift_L",\
-				"", "Shift_R",\
-				NULL }
-
-#define KEYSTRING_MAX_LEN 16
-
-gchar *get_full_keystr(guint keyval, guint state) {
-	/* strlen("Ctrl+Alt+Shift+Meta+")+1 == 21 */
-	const gsize max_modstr_len = 21;
-	gchar modstr[max_modstr_len];
-	gboolean found = FALSE;
-	const gchar *keystr = gdk_keyval_name(keyval);
-	const gchar *keystrmap[] = KEYSTRING_MAP;
-	modstr[0] = '\0';
-
-	if((state&GDK_SHIFT_MASK) != 0)
-	{
-		g_strlcat(modstr, "Shift+", max_modstr_len);
-	}
-
-	if((state&GDK_CONTROL_MASK) != 0)
-	{
-		g_strlcat(modstr, "Ctrl+", max_modstr_len);
-	}
-
-	if((state&GDK_MOD1_MASK) != 0)
-	{
-		g_strlcat(modstr, "Alt+", max_modstr_len);
-	}
-
-	if((state&GDK_META_MASK) != 0 || (state&GDK_SUPER_MASK) != 0)
-	{
-		g_strlcat(modstr, "Meta+", max_modstr_len);
-	}
-
-	/* Translate GDK key name to mpv key name */
-	for(gint i = 0; !found && keystrmap[i]; i += 2)
-	{
-		gint rc = g_ascii_strncasecmp(	keystr,
-						keystrmap[i+1],
-						KEYSTRING_MAX_LEN );
-
-		if(rc == 0)
-		{
-			keystr = keystrmap[i];
-			found = TRUE;
-		}
-	}
-
-	return (strlen(keystr) > 0)?g_strconcat(modstr, keystr, NULL):NULL;
 }
 
 } /* namespace Mediaplayer */

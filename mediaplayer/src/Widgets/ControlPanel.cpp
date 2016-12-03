@@ -12,8 +12,6 @@
 
 namespace Mediaplayer {
 
-static std::string format_time(int,int);
-
 ControlPanel::ControlPanel() :
 		Gtk::Box { Gtk::ORIENTATION_HORIZONTAL }, buttonsPanel {
 				Gtk::ORIENTATION_HORIZONTAL, 10 } {
@@ -29,7 +27,7 @@ ControlPanel::ControlPanel() :
 	buttonsPanel.set_margin_right(10);
 	buttonsPanel.set_margin_left(10);
 
-	timeLabel.set_text("00:00:00 / 00:00:00");
+	timeLabel.set_text(time_default_string);
 	timeLabel.set_margin_right(10);
 	timeLabel.set_margin_left(10);
 
@@ -73,16 +71,6 @@ void ControlPanel::set_current_time(int current_time) {
 	int current_minutes = remaining / 60;
 	int current_seconds = remaining % 60;
 
-//	using T = std::tuple<int,int,std::string>;
-//	T components[] = {
-//			{current_hours, 2, ""},
-//			{current_minutes, 2, ":"},
-//			{current_seconds, 2, ":"},
-//			{m_overall_hours, 2, "/"},
-//			{m_overall_minutes, 2, ":"},
-//			{m_overall_seconds, 2, ":"}
-//	};
-
 	std::ostringstream stream;
 	stream << std::setw(2) << std::setfill('0') << current_hours;
 	stream << ":" << std::setw(2) << std::setfill('0') << current_minutes;
@@ -92,6 +80,10 @@ void ControlPanel::set_current_time(int current_time) {
 	stream << ":" << std::setw(2) << std::setfill('0') << m_overall_seconds;
 
 	timeLabel.set_text(stream.str());
+}
+
+void ControlPanel::set_time_default() {
+	timeLabel.set_text(time_default_string);
 }
 
 } /* namespace Mediaplayer */

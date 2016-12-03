@@ -60,8 +60,9 @@ private:
 	Gtk::MenuBar menuBar;
 	Gtk::Stack videoArea;
 	Gtk::Menu popupMenu;
+	Gtk::Box windowLayout;
 
-	sigc::connection hideWidgetsConnection;
+	sigc::connection hideWidgetsTimer;
 
 	const char *default_title = "Mediaplayer";
 };

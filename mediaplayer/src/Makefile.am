@@ -1,8 +1,9 @@
 bin_PROGRAMS=mediaplayer
 mediaplayer_SOURCES=main.cpp Application.cpp MpvHandleWrapper.cpp
 mediaplayer_LDADD=$(MEDIAPLAYER_LIBS) \
-                    Widgets/libmpv-widgets.la \
-                    Factories/libmpv-factories.la \
-                    Dialogs/libmpv-dialogs.la
+                    Widgets/libmediaplayer-widgets.la \
+                    Factories/libmediaplayer-factories.la \
+                    Dialogs/libmediaplayer-dialogs.la \
+                    Utils/libmediaplayer-utils.la
 mediaplayer_CXXFLAGS=$(MEDIAPLAYER_CFLAGS)
-SUBDIRS = Widgets Dialogs Factories
+SUBDIRS = Widgets Dialogs Factories Utils

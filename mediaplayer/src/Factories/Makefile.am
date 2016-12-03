@@ -1,4 +1,4 @@
-noinst_LTLIBRARIES = libmpv-factories.la
-libmpv_factories_la_SOURCES = MenuBarFactory.cpp
-libmpv_factories_la_CXXFLAGS = $(MEDIAPLAYER_CFLAGS)
-libmpv_factories_la_LIBADD = $(MEDIAPLAYER_LIBS)
+noinst_LTLIBRARIES = libmediaplayer-factories.la
+libmediaplayer_factories_la_SOURCES = MenuBarFactory.cpp
+libmediaplayer_factories_la_CXXFLAGS = $(MEDIAPLAYER_CFLAGS)
+libmediaplayer_factories_la_LIBADD = $(MEDIAPLAYER_LIBS)

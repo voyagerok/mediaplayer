@@ -19,6 +19,7 @@ AC_CONFIG_FILES([
 	src/Widgets/Makefile 
 	src/Dialogs/Makefile 
 	src/Factories/Makefile
+	src/Utils/Makefile
 ])
 AC_OUTPUT
 
