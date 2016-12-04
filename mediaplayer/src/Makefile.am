@@ -25,8 +25,8 @@ GLIB_COMPILE_RESOURCES = glib-compile-resources
 RESOURCE_FILES = $(shell $(GLIB_COMPILE_RESOURCES) --sourcedir=$(srcdir)/Views --generate-dependencies $(srcdir)/Views/views.gresource.xml)
 
 Views/mediaplayer_views.cpp: Views/views.gresource.xml $(RESOURCE_FILES)
-	$(AM_V_GEN) glib-compile-resources --target=Views/mediaplayer_views.cpp --sourcedir=$(srcdir)/Views --generate --c-name=mediaplayer_views $<
-	$(AM_V_GEN) glib-compile-resources --target=Views/mediaplayer_views.h --sourcedir=$(srcdir)/Views --generate --c-name=mediaplayer_views $<
+	$(AM_V_GEN) $(GLIB_COMPILE_RESOURCES) --target=Views/mediaplayer_views.cpp --sourcedir=$(srcdir)/Views --generate-source --c-name=mediaplayer_views Views/views.gresource.xml  
+	$(AM_V_GEN) $(GLIB_COMPILE_RESOURCES) --target=Views/mediaplayer_views.h --sourcedir=$(srcdir)/Views --generate-header --c-name=mediaplayer_views Views/views.gresource.xml
 
 bin_PROGRAMS=mediaplayer
 

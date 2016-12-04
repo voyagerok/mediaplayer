@@ -18,7 +18,6 @@ PKG_CHECK_MODULES([mpv], [mpv])
 AC_CONFIG_FILES([
 	Makefile 
 	src/Makefile
-	src/Views/Makefile 
 ])
 AC_OUTPUT
 
