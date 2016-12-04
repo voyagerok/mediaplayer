@@ -18,7 +18,7 @@ MpvContainer::MpvContainer() : Gtk::DrawingArea() {
 
 int64_t MpvContainer::get_wid() {
 
-	std::cerr << "mpv_container realized: " << get_realized() << std::endl;
+//	std::cerr << "mpv_container realized: " << get_realized() << std::endl;
 
 //	auto parent = this->get_parent_window();
 //	if (parent && !get_realized())

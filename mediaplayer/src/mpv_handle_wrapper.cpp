@@ -38,20 +38,16 @@ void MpvHandleWrapper::initialize(int64_t wid) {
 	this->wid = wid;
 	mpv_set_option(mpv, "wid", MPV_FORMAT_INT64, &wid);
 
-	struct defaullt_options {
-		const char *name;
-		const char *value;
-	} options[] = {
+	std::map<std::string,std::string> default_options = {
 			{"osd-level", "1"},
 			{"idle", "yes"},
 			{"input-default-bindings", "yes"},
 			{"input-cursor", "no"},
-			{"cursor-autohide", "no"},
-			{NULL, NULL}
+			{"cursor-autohide", "no"}
 	};
 
-	for (int i = 0; options[i].name; ++i) {
-		mpv_set_option_string(mpv, options[i].name, options[i].value);
+	for (auto &option : default_options) {
+		mpv_set_option_string(mpv, option.first.c_str(), option.second.c_str());
 	}
 
 	mpv_observe_property(mpv, 0, percent_pos_property_name, MPV_FORMAT_DOUBLE);
