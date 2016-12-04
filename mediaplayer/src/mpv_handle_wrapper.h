@@ -5,8 +5,8 @@
  *      Author: nikolay
  */
 
-#ifndef MPVHANDLEWRAPPER_H_
-#define MPVHANDLEWRAPPER_H_
+#ifndef MPV_HANDLE_WRAPPER_H_
+#define MPV_HANDLE_WRAPPER_H_
 
 #include <mpv/client.h>
 #include <string>
@@ -65,4 +65,4 @@ private:
 
 } /* namespace Mediaplayer */
 
-#endif /* MPVHANDLEWRAPPER_H_ */
+#endif /* MPV_HANDLE_WRAPPER_H_ */

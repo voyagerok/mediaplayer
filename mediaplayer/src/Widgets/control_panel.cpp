@@ -5,7 +5,8 @@
  *      Author: nikolay
  */
 
-#include "ControlPanel.h"
+#include "control_panel.h"
+
 #include <sstream>
 #include <chrono>
 #include <iomanip>

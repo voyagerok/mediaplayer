@@ -9,11 +9,12 @@
 #define WIDGETS_WINDOW_H_
 
 #include <gtkmm.h>
-#include "../Dialogs/IFileDialog.h"
-#include "MpvContainer.h"
-#include "../MpvHandleWrapper.h"
-#include "Slider.h"
-#include "ControlPanel.h"
+
+#include "../Dialogs/file_dialog.h"
+#include "../mpv_handle_wrapper.h"
+#include "control_panel.h"
+#include "mpv_container.h"
+#include "slider.h"
 
 namespace Mediaplayer {
 
@@ -47,7 +48,7 @@ private:
 	void show_control_widgets();
 	void set_idle_state();
 
-	using FileDialogPtr = std::unique_ptr<IFileDialog>;
+	using FileDialogPtr = std::unique_ptr<FileDialog>;
 
 	FileDialogPtr openFileDialog;
 	MpvContainer container;

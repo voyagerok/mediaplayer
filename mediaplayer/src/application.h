@@ -9,10 +9,11 @@
 #define APPLICATION_H_
 
 #include <gtkmm.h>
-#include "Widgets/Window.h"
-#include "Factories/IMenuFactory.h"
-#include "Dialogs/IFileDialog.h"
 #include <vector>
+
+#include "Dialogs/file_dialog.h"
+#include "Factories/menu_factory.h"
+#include "Widgets/window.h"
 
 namespace Mediaplayer {
 
@@ -26,8 +27,8 @@ protected:
 	void on_open_in_new_window();
 	void on_window_hidden(Gtk::Window*);
 private:
-	using MenuBarPtr = std::unique_ptr<IMenuFactory>;
-	using FileDialogPtr = std::unique_ptr<IFileDialog>;
+	using MenuBarPtr = std::unique_ptr<MenuFactory>;
+	using FileDialogPtr = std::unique_ptr<FileDialog>;
 	MenuBarPtr menuModel;
 	FileDialogPtr fileDialog;
 

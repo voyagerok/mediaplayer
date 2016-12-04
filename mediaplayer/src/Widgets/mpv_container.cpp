@@ -5,7 +5,8 @@
  *      Author: nikolay
  */
 
-#include "MpvContainer.h"
+#include "mpv_container.h"
+
 #include <gdk/gdkx.h>
 #include <iostream>
 

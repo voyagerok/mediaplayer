@@ -5,7 +5,7 @@
  *      Author: nikolay
  */
 
-#include "Gtk3FileDialog.h"
+#include "gtk3_file_dialog.h"
 
 namespace Mediaplayer {
 

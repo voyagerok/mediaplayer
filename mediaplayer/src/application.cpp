@@ -5,11 +5,12 @@
  *      Author: nikolay
  */
 
-#include "Application.h"
-#include "Factories/MenuBarFactory.h"
-#include "Dialogs/Gtk3FileDialog.h"
+#include <application.h>
 #include "Views/mediaplayer_views.h"
 #include <iostream>
+
+#include "Dialogs/gtk3_file_dialog.h"
+#include "Factories/menu_bar_factory.h"
 
 namespace Mediaplayer {
 

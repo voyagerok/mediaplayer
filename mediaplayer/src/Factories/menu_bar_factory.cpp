@@ -5,8 +5,9 @@
  *      Author: nikolay
  */
 
+#include "menu_bar_factory.h"
+
 #include <iostream>
-#include "MenuBarFactory.h"
 
 namespace Mediaplayer {
 

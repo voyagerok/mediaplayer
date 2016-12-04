@@ -5,12 +5,13 @@
  *      Author: nikolay
  */
 
-#include "Window.h"
-#include "../Dialogs/Gtk3FileDialog.h"
-#include "../Application.h"
-#include "../Utils/KeyNameTranslator.h"
+#include "window.h"
+
 #include <cmath>
 #include <iostream>
+#include "../application.h"
+#include "../Dialogs/gtk3_file_dialog.h"
+#include "../Utils/key_name_translator.h"
 
 namespace Mediaplayer {
 

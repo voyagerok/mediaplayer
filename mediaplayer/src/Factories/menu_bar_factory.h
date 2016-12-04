@@ -5,21 +5,21 @@
  *      Author: nikolay
  */
 
-#ifndef FACTORIES_MENUBARFACTORY_H_
-#define FACTORIES_MENUBARFACTORY_H_
+#ifndef FACTORIES_MENU_BAR_FACTORY_H_
+#define FACTORIES_MENU_BAR_FACTORY_H_
 
-#include "IMenuFactory.h"
+#include "menu_factory.h"
 
 namespace Mediaplayer {
 
-class MenuBarFactory: public IMenuFactory {
+class MenuBarFactory: public MenuFactory {
 public:
 	Glib::RefPtr<Gio::Menu> CreateMenuInstance() override;
 private:
-	const std::string menubarResourcePath = "/org/apps/mediaplayer/Menubar.xml";
+	const std::string menubarResourcePath = "/org/apps/mediaplayer/menubar.xml";
 	const std::string menubarObjectId = "MenuBar";
 };
 
 } /* namespace Mediaplayer */
 
-#endif /* FACTORIES_MENUBARFACTORY_H_ */
+#endif /* FACTORIES_MENU_BAR_FACTORY_H_ */

@@ -5,14 +5,14 @@
  *      Author: nikolay
  */
 
-#ifndef DIALOGS_GTK3FILEDIALOG_H_
-#define DIALOGS_GTK3FILEDIALOG_H_
+#ifndef DIALOGS_GTK3_FILE_DIALOG_H_
+#define DIALOGS_GTK3_FILE_DIALOG_H_
 
-#include "IFileDialog.h"
+#include "file_dialog.h"
 
 namespace Mediaplayer {
 
-class Gtk3FileDialog: public IFileDialog {
+class Gtk3FileDialog: public FileDialog {
 public:
 	DialogResult ShowDialog() override;
 	DialogResult ShowDialog(Gtk::Window&) override;
@@ -25,4 +25,4 @@ private:
 
 } /* namespace Mediaplayer */
 
-#endif /* DIALOGS_GTK3FILEDIALOG_H_ */
+#endif /* DIALOGS_GTK3_FILE_DIALOG_H_ */

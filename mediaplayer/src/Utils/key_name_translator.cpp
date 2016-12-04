@@ -6,7 +6,8 @@
  */
 
 
-#include "KeyNameTranslator.h"
+#include "key_name_translator.h"
+
 #include <gtkmm.h>
 #include <map>
 

@@ -12,15 +12,13 @@ LT_INIT
 
 AC_PROG_CXX
 
-PKG_CHECK_MODULES([MEDIAPLAYER], [gtkmm-3.0 mpv glib-2.0])
+PKG_CHECK_MODULES([gtkmm3], [gtkmm-3.0 glib-2.0])
+PKG_CHECK_MODULES([mpv], [mpv])
 
 AC_CONFIG_FILES([
-	Makefile src/Makefile 
-	src/Widgets/Makefile 
-	src/Dialogs/Makefile 
-	src/Factories/Makefile
-	src/Utils/Makefile
-	src/Views/Makefile
+	Makefile 
+	src/Makefile
+	src/Views/Makefile 
 ])
 AC_OUTPUT
 

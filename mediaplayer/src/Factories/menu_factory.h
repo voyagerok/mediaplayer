@@ -5,20 +5,20 @@
  *      Author: nikolay
  */
 
-#ifndef FACTORIES_IMENUFACTORY_H_
-#define FACTORIES_IMENUFACTORY_H_
+#ifndef FACTORIES_MENU_FACTORY_H_
+#define FACTORIES_MENU_FACTORY_H_
 
 #include <gtkmm.h>
 
 namespace Mediaplayer {
 
-class IMenuFactory {
+class MenuFactory {
 public:
 	virtual Glib::RefPtr<Gio::Menu> CreateMenuInstance() = 0;
-	virtual ~IMenuFactory() {}
+	virtual ~MenuFactory() {}
 };
 
 } /* namespace Mediaplayer */
 
 
-#endif /* FACTORIES_IMENUFACTORY_H_ */
+#endif /* FACTORIES_MENU_FACTORY_H_ */

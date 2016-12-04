@@ -5,8 +5,8 @@
  *      Author: nikolay
  */
 
-#ifndef WIDGETS_MPVCONTAINER_H_
-#define WIDGETS_MPVCONTAINER_H_
+#ifndef WIDGETS_MPV_CONTAINER_H_
+#define WIDGETS_MPV_CONTAINER_H_
 
 #include <gtkmm.h>
 
@@ -23,4 +23,4 @@ protected:
 
 } /* namespace Mediaplayer */
 
-#endif /* WIDGETS_MPVCONTAINER_H_ */
+#endif /* WIDGETS_MPV_CONTAINER_H_ */

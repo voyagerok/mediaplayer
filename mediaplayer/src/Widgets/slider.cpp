@@ -5,7 +5,7 @@
  *      Author: nikolay
  */
 
-#include "Slider.h"
+#include "slider.h"
 
 namespace Mediaplayer {
 

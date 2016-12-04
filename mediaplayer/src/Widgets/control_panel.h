@@ -5,11 +5,12 @@
  *      Author: nikolay
  */
 
-#ifndef WIDGETS_CONTROLPANEL_H_
-#define WIDGETS_CONTROLPANEL_H_
+#ifndef WIDGETS_CONTROL_PANEL_H_
+#define WIDGETS_CONTROL_PANEL_H_
 
 #include <gtkmm.h>
-#include "Slider.h"
+
+#include "slider.h"
 
 namespace Mediaplayer {
 
@@ -52,4 +53,4 @@ private:
 
 } /* namespace Mediaplayer */
 
-#endif /* WIDGETS_CONTROLPANEL_H_ */
+#endif /* WIDGETS_CONTROL_PANEL_H_ */

@@ -5,8 +5,8 @@
  *      Author: nikolay
  */
 
-#ifndef UTILS_KEYNAMETRANSLATOR_H_
-#define UTILS_KEYNAMETRANSLATOR_H_
+#ifndef UTILS_KEY_NAME_TRANSLATOR_H_
+#define UTILS_KEY_NAME_TRANSLATOR_H_
 
 #include <string>
 
@@ -18,4 +18,4 @@ std::string translate_from_gdk_to_mpv(unsigned gdk_key_value, unsigned gdk_mod_k
 }}
 
 
-#endif /* UTILS_KEYNAMETRANSLATOR_H_ */
+#endif /* UTILS_KEY_NAME_TRANSLATOR_H_ */

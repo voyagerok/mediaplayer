@@ -5,8 +5,8 @@
  *      Author: nikolay
  */
 
-#ifndef DIALOGS_IFILEDIALOG_H_
-#define DIALOGS_IFILEDIALOG_H_
+#ifndef DIALOGS_FILE_DIALOG_H_
+#define DIALOGS_FILE_DIALOG_H_
 
 #include <gtkmm.h>
 
@@ -14,14 +14,14 @@ namespace Mediaplayer {
 
 enum class DialogResult {Confirmed, Canceled};
 
-class IFileDialog {
+class FileDialog {
 public:
 	virtual DialogResult ShowDialog() = 0;
 	virtual DialogResult ShowDialog(Gtk::Window&) = 0;
 	virtual std::string GetFilename() = 0;
-	virtual ~IFileDialog() {}
+	virtual ~FileDialog() {}
 };
 
 } /* namespace Mediaplayer */
 
-#endif /* DIALOGS_IFILEDIALOG_H_ */
+#endif /* DIALOGS_FILE_DIALOG_H_ */

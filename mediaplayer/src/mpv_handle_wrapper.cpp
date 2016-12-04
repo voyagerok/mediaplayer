@@ -5,7 +5,8 @@
  *      Author: nikolay
  */
 
-#include "MpvHandleWrapper.h"
+#include "mpv_handle_wrapper.h"
+
 #include <stdexcept>
 #include <iostream>
 
