@@ -17,7 +17,8 @@ namespace Mediaplayer {
 
 Window::Window(Glib::RefPtr<Gio::Menu> menu) :
 		Gtk::ApplicationWindow(), openFileDialog(new Gtk3FileDialog), menuBar {
-				menu }, popupMenu {menu} {
+				menu }, popupMenu {menu}, windowLayout{Gtk::ORIENTATION_VERTICAL}
+{
 
 	set_default_size(800, 600);
 	set_title(default_title);
@@ -26,18 +27,21 @@ Window::Window(Glib::RefPtr<Gio::Menu> menu) :
 	controlPanelRevealer.set_reveal_child(false);
 	controlPanelRevealer.set_valign(Gtk::ALIGN_END);
 
-	menuBarRevealer.add(menuBar);
-	menuBarRevealer.set_reveal_child(false);
-	menuBarRevealer.set_valign(Gtk::ALIGN_START);
+//	menuBarRevealer.add(menuBar);
+//	menuBarRevealer.set_reveal_child(false);
+//	menuBarRevealer.set_valign(Gtk::ALIGN_START);
 
 	videoArea.add(container);
 	videoArea.set_visible_child(container);
 
 	m_Overlay.add(videoArea);
 	m_Overlay.add_overlay(controlPanelRevealer);
-	m_Overlay.add_overlay(menuBarRevealer);
+	//m_Overlay.add_overlay(menuBarRevealer);
 
-	add(m_Overlay);
+	windowLayout.pack_start(menuBar, false, true, 0);
+	windowLayout.pack_start(m_Overlay, true, true, 0);
+	add(windowLayout);
+	//add(m_Overlay);
 
 	add_action("fileopen", sigc::mem_fun(*this, &Window::on_file_open));
 
@@ -107,7 +111,8 @@ void Window::toggle_fullscreen() {
 	isFullscreen = !isFullscreen;
 	hideWidgetsTimer.disconnect();
 	controlPanelRevealer.set_reveal_child(!isFullscreen);
-	menuBarRevealer.set_reveal_child(!isFullscreen);
+	//menuBarRevealer.set_reveal_child(!isFullscreen);
+	menuBar.set_visible(!isFullscreen);
 	set_cursor_visibility(!isFullscreen);
 }
 
@@ -150,7 +155,7 @@ void Window::on_mpv_fullscreen_signal() {
 
 bool Window::on_hide_widgets_timeout(int) {
 	controlPanelRevealer.set_reveal_child(false);
-	menuBarRevealer.set_reveal_child(false);
+	//menuBarRevealer.set_reveal_child(false);
 	set_cursor_visibility(false);
 	return false;
 }
@@ -176,7 +181,7 @@ bool Window::on_mpv_container_button_press(GdkEventButton *eventButton) {
 
 void Window::show_control_widgets() {
 	controlPanelRevealer.set_reveal_child();
-	menuBarRevealer.set_reveal_child();
+	//menuBarRevealer.set_reveal_child();
 	set_cursor_visibility(true);
 
 	sigc::slot<bool> hide_widgets_slot = sigc::bind(sigc::mem_fun(*this, &Window::on_hide_widgets_timeout), 0);

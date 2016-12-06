@@ -23,7 +23,7 @@ Application::Application(int argc, char** argv) :
 
 void Application::on_startup() {
 	Gtk::Application::on_startup();
-	//set_menubar(menuBar->CreateMenuInstance());
+	//set_menubar(menuModel->CreateMenuInstance());
 
 	Window *window { new Window(menuModel->CreateMenuInstance()) };
 	store_window(window);
